@@ -16,20 +16,19 @@ class S3_helper {
 		);
 
 	function __construct($access_key = null, $secret_key = null, $region = null) {
-		if ($access_key && $secret_key) {
-			$this->init_s3($access_key, $secret_key, $region);
-		}
+		$this->init_s3($access_key, $secret_key, $region);
 	}
 
 	// get S3 object
 	public function init_s3($access_key, $secret_key, $region = null){
 		if ( !isset($region) )
 			$region = Region::AP_NORTHEAST_1;
-		$s3 = Aws::factory(array(
-			'key' => $access_key,
-			'secret' => $secret_key,
-			'region' => $this->get_region($region),
-			))->get('s3');
+		$credentials = array('region' => $this->get_region($region));
+		if ( $access_key && $secret_key ) {
+			$credentials['key'] = $access_key;
+			$credentials['secret'] = $secret_key;
+		}
+		$s3 = Aws::factory($credentials)->get('s3');
 		$this->s3 = $s3;
 		return $s3;
 	}
