@@ -2,7 +2,7 @@
 /**
  * Class SampleTest
  *
- * @package Staticpress_S3
+ * @package static_press_s3/tests
  */
 
 /**
