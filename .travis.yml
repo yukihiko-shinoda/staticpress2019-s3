@@ -18,6 +18,12 @@ cache:
 
 matrix:
   include:
+    # Since current PHP recommended version is 7.3+.
+    # @see https://wordpress.org/support/article/requirements/
+    - php: 7.4
+      env: WP_VERSION=latest
+    - php: 7.3
+      env: WP_VERSION=latest
     - php: 7.2
       env: WP_VERSION=latest
     - php: 7.1
