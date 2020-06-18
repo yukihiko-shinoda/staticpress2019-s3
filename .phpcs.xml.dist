@@ -37,7 +37,7 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<!-- Value: replace the function, class, and variable prefixes used. Separate multiple prefixes with a comma. -->
-			<property name="prefixes" type="array" value="my-plugin"/>
+			<property name="prefixes" type="array" value="static_press_s3"/>
 		</properties>
 	</rule>
 	<rule ref="WordPress.WP.I18n">
