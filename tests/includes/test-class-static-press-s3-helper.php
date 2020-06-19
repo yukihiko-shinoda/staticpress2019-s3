@@ -33,7 +33,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	public function provider_mime_type() {
 		return array(
 			array( 'not-found.txt', false ),
-			array( 'empty.txt', 'inode/x-empty' ),
+			array( 'empty.txt', version_compare( PHP_VERSION, '7.4', '>=' ) ? 'application/x-empty' : 'inode/x-empty' ),
 			array( 'file.aac', 'application/octet-stream' ),
 			array( 'file.css', 'text/css' ),
 			array( 'file.csv', 'text/plain' ),
