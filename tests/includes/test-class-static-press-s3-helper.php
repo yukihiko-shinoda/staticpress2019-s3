@@ -29,27 +29,31 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Function mime_type() should returns appropriate mime type.
+	 * 
+	 * @see https://en.wikipedia.org/wiki/Media_type
+	 * @see https://www.freeformatter.com/mime-types-list.html#mime-types-list
+	 * @see https://github.com/symfony/symfony/blob/v5.1.2/src/Symfony/Component/Mime/MimeTypes.php
 	 */
 	public function provider_mime_type() {
 		return array(
 			array( 'not-found.txt', false ),
 			array( 'empty.txt', version_compare( PHP_VERSION, '7.4', '>=' ) ? 'application/x-empty' : 'inode/x-empty' ),
-			array( 'file.aac', 'application/octet-stream' ),
+			array( 'file.aac', 'audio/aac' ),
 			array( 'file.css', 'text/css' ),
 			array( 'file.csv', 'text/plain' ),
-			array( 'file.flac', 'application/octet-stream' ),
-			array( 'file.gif', 'application/octet-stream' ),
+			array( 'file.flac', 'audio/flac' ),
+			array( 'file.gif', 'image/gif' ),
 			array( 'file.htm', 'text/html' ),
 			array( 'file.html', 'text/html' ),
-			array( 'file.jpe', 'application/octet-stream' ),
-			array( 'file.jpeg', 'application/octet-stream' ),
-			array( 'file.jpg', 'application/octet-stream' ),
-			array( 'file.js', 'application/x-javascript' ),
-			array( 'file.m4a', 'application/octet-stream' ),
-			array( 'file.mp3', 'application/octet-stream' ),
-			array( 'file.png', 'application/octet-stream' ),
+			array( 'file.jpe', 'image/jpeg' ),
+			array( 'file.jpeg', 'image/jpeg' ),
+			array( 'file.jpg', 'image/jpeg' ),
+			array( 'file.js', 'application/javascript' ),
+			array( 'file.m4a', 'audio/m4a' ),
+			array( 'file.mp3', 'audio/mpeg' ),
+			array( 'file.png', 'image/png' ),
 			array( 'file.txt', 'text/plain' ),
-			array( 'file.wav', 'application/octet-stream' ),
+			array( 'file.wav', 'audio/wav' ),
 			array( 'file.xml', 'application/xml' ),
 			array( 'no-extension', 'text/plain' ),
 		);
