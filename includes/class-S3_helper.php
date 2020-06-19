@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__FILE__).'/aws.phar');
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-mime-type-checker.php';
 
 use Aws\Common\Aws;
 use Aws\Common\Enum\Region;
@@ -200,18 +201,7 @@ class S3_helper {
 			? $info->file( $filename )
 			: false;
 
-		if ( 'text/plain' == $mime_type ) {
-			if ( preg_match( '/\.css$/i', $filename ) ) {
-				$mime_type = 'text/css';
-			} elseif ( preg_match( '/\.js$/i', $filename ) ) {
-				$mime_type = 'application/x-javascript';
-			} elseif ( preg_match( '/\.html?$/i', $filename ) ) {
-				$mime_type = 'text/html';
-			} elseif ( preg_match( '/\.xml$/i', $filename ) ) {
-				$mime_type = 'application/xml';
-			}
-		}
-
-		return $mime_type;
+		$mime_type_checker = new Static_Press_S3_Mime_Type_Checker( $filename, $mime_type );
+		return $mime_type_checker->get_mime_type();
 	}
 }
