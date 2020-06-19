@@ -36,31 +36,66 @@ class Static_Press_S3_Mime_Type_Checker {
 
 	/**
 	 * Gets mime type.
+	 * 
+	 * @return string Mime type.
 	 */
 	public function get_mime_type() {
-		if ( 'text/plain' != $this->mime_type ) {
-			return $this->mime_type;
+		switch ( $this->mime_type ) {
+			case 'text/plain':
+				return $this->get_mime_type_for_text();
+			case 'application/octet-stream':
+				return $this->get_mime_type_for_media();
+			default:
+				return $this->mime_type;
 		}
-
-		return $this->get_mime_type_for_text( $this->path_to_file, $this->mime_type );
 	}
 
 	/**
 	 * Gets mime type for text.
 	 * 
-	 * @return string Extension.
+	 * @return string Mime type.
 	 */
 	private function get_mime_type_for_text() {
 		switch ( $this->get_extension() ) {
 			case 'css':
 				return 'text/css';
 			case 'js':
-				return 'application/x-javascript';
+				return 'application/javascript';
 			case 'htm':
 			case 'html':
 				return 'text/html';
 			case 'xml':
 				return 'application/xml';
+			default:
+				return $this->mime_type;
+		}
+	}
+
+	/**
+	 * Gets mime type for media.
+	 * 
+	 * @return string Mime type.
+	 */
+	private function get_mime_type_for_media() {
+		switch ( $this->get_extension() ) {
+			case 'aac':
+				return 'audio/aac';
+			case 'flac':
+				return 'audio/flac';
+			case 'gif':
+				return 'image/gif';
+			case 'jpe':
+			case 'jpeg':
+			case 'jpg':
+				return 'image/jpeg';
+			case 'm4a':
+				return 'audio/m4a';
+			case 'mp3':
+				return 'audio/mpeg';
+			case 'png':
+				return 'image/png';
+			case 'wav':
+				return 'audio/wav';
 			default:
 				return $this->mime_type;
 		}
