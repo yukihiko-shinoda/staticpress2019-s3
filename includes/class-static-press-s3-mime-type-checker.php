@@ -64,6 +64,8 @@ class Static_Press_S3_Mime_Type_Checker {
 			case 'htm':
 			case 'html':
 				return 'text/html';
+			case 'svg':
+				return 'image/svg+xml';
 			case 'xml':
 				return 'application/xml';
 			default:

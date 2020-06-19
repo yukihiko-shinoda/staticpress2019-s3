@@ -52,6 +52,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 			array( 'file.m4a', 'audio/m4a' ),
 			array( 'file.mp3', 'audio/mpeg' ),
 			array( 'file.png', 'image/png' ),
+			array( 'file.svg', 'image/svg+xml' ),
 			array( 'file.txt', 'text/plain' ),
 			array( 'file.wav', 'audio/wav' ),
 			array( 'file.xml', 'application/xml' ),
