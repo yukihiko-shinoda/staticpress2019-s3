@@ -29,6 +29,14 @@ License:
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+if ( ! defined( 'STATIC_PRESS_S3_PLUGIN_DIR' ) ) {
+	/**
+	 * Plugin Directory.
+	 *
+	 * @var string $STATIC_PRESS_S3_PLUGIN_DIR Plugin folder directory path. Eg. `/var/www/html/web/app/plugins/staticpress-s32019/`
+	 */
+	define( 'STATIC_PRESS_S3_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+}
 add_action('plugins_loaded', function(){
 	global $staticpress;
 	if (!isset($staticpress))
