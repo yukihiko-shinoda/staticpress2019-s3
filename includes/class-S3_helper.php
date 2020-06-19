@@ -181,31 +181,37 @@ class S3_helper {
 		return $filebody;
  	}
 
-	// get file_type
-	private function mime_type($filename){
+	/**
+	 * Gets mime type.
+	 * 
+	 * @param string $filename Path to file.
+	 * @return string Mime type.
+	 */
+	private function mime_type( $filename ) {
 		static $info;
-		if (!isset($info)) {
+		if ( ! isset( $info ) ) {
 			$magic_file = '/usr/share/misc/magic';
-			$info = file_exists($magic_file)
-			? new FInfo(FILEINFO_MIME_TYPE, $magic_file)
-			: new FInfo(FILEINFO_MIME_TYPE);
-        }
+			$info       = file_exists( $magic_file )
+			? new FInfo( FILEINFO_MIME_TYPE, $magic_file )
+			: new FInfo( FILEINFO_MIME_TYPE );
+		}
 		$mime_type =
-			file_exists($filename)
-			? $info->file($filename)
+			file_exists( $filename )
+			? $info->file( $filename )
 			: false;
 
-		if ( $mime_type == 'text/plain') {
-			if (preg_match('/\.css$/i', $filename))
+		if ( 'text/plain' == $mime_type ) {
+			if ( preg_match( '/\.css$/i', $filename ) ) {
 				$mime_type = 'text/css';
-			else if (preg_match('/\.js$/i', $filename))
+			} elseif ( preg_match( '/\.js$/i', $filename ) ) {
 				$mime_type = 'application/x-javascript';
-			else if (preg_match('/\.html?$/i', $filename))
+			} elseif ( preg_match( '/\.html?$/i', $filename ) ) {
 				$mime_type = 'text/html';
-			else if (preg_match('/\.xml$/i', $filename))
+			} elseif ( preg_match( '/\.xml$/i', $filename ) ) {
 				$mime_type = 'application/xml';
+			}
 		}
 
 		return $mime_type;
- 	}
+	}
 }
