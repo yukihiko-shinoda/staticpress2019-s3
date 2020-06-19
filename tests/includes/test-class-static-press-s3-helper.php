@@ -55,7 +55,8 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 			array( 'file.txt', 'text/plain' ),
 			array( 'file.wav', 'audio/wav' ),
 			array( 'file.xml', 'application/xml' ),
-			array( 'no-extension', 'text/plain' ),
+			array( 'no-extension-text', 'text/plain' ),
+			array( 'no-extension-media', 'application/octet-stream' ),
 		);
 	}
 
