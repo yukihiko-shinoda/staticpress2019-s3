@@ -7,7 +7,8 @@
 
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws.phar';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-S3_helper.php';
-use Mockery;
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
+use static_press_s3\tests\testlibraries\Path_Creator;
 /**
  * Static_Press_S3_Helper test case.
  *
@@ -131,7 +132,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 		$upload_path       = '';
 		$bucket            = '';
 		$response          = 'response';
-		$file_path         = $this->create_file_path( $filename );
+		$file_path         = Path_Creator::create_file_path( $filename );
 		$expected_argument = Mockery::on(
 			function ( $argument ) use ( $bucket, $file_path ) {
 				$bucket_is_set        = isset( $argument['Bucket'] ) && $bucket === $argument['Bucket'];
@@ -144,7 +145,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 			}
 		);
 		$s3_helper         = $this->create_s3_helper_partial_mock( $this->create_s3_client_partial_mock( $expected_argument, $response ) );
-		$this->assertEquals( $response, $s3_helper->upload( $this->create_file_path( $filename ), $upload_path, $bucket ) );
+		$this->assertEquals( $response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
 	}
 
 	/**
@@ -158,7 +159,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 		$expected_argument = array();
 		$expected_response = false;
 		$s3_helper         = $this->create_s3_helper_partial_mock( $this->create_s3_client_partial_mock( $expected_argument, $response ) );
-		$this->assertEquals( $expected_response, $s3_helper->upload( $this->create_file_path( $filename ), $upload_path, $bucket ) );
+		$this->assertEquals( $expected_response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
 	}
 
 	/**
@@ -170,7 +171,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 		$bucket            = '';
 		$expected_response = false;
 		$s3_helper         = $this->create_s3_helper_partial_mock( false );
-		$this->assertEquals( $expected_response, $s3_helper->upload( $this->create_file_path( $filename ), $upload_path, $bucket ) );
+		$this->assertEquals( $expected_response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
 	}
 
 	/**
@@ -213,20 +214,11 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * @throws ReflectionException When fail to create ReflectionClass instance.
 	 */
 	public function test_mime_type( $file_name, $expect ) {
-		$file_path = $this->create_file_path( $file_name );
+		$file_path = Path_Creator::create_file_path( $file_name );
 		$result    = $this->call_private_method( 'mime_type', array( $file_path ) );
 		$this->assertEquals( $expect, $result );
 	}
 
-	/**
-	 * Creates file path.
-	 * 
-	 * @param string $file_name File name.
-	 * @return string File path.
-	 */
-	private function create_file_path( $file_name ) {
-		return STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testresources/' . $file_name;
-	}
 	/**
 	 * Function mime_type() should returns appropriate mime type.
 	 * 
