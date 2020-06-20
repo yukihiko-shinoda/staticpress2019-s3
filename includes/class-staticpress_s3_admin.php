@@ -121,9 +121,9 @@ class staticpress_s3_admin {
 
 		// Get S3 Object
 		$s3 = new S3_helper(
-			isset($this->options['access_key']) ? $this->options['access_key'] : null,
-			isset($this->options['secret_key']) ? $this->options['secret_key'] : null,
-			isset($this->options['region']) ? $this->options['region'] : null
+			!empty($this->options['access_key']) ? $this->options['access_key'] : null,
+			!empty($this->options['secret_key']) ? $this->options['secret_key'] : null,
+			!empty($this->options['region']) ? $this->options['region'] : null
 			);
 		$regions = $this->regions;
 		$buckets = false;
