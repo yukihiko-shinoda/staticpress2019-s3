@@ -68,10 +68,10 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * @param array  $array_parameter Array of parameter.
 	 */
 	private function call_private_method( $method_name, $array_parameter ) {
-		$transient_manager = new S3_helper();
-		$reflection        = new \ReflectionClass( get_class( $transient_manager ) );
-		$method            = $reflection->getMethod( $method_name );
+		$s3_helper  = new S3_helper();
+		$reflection = new \ReflectionClass( get_class( $s3_helper ) );
+		$method     = $reflection->getMethod( $method_name );
 		$method->setAccessible( true );
-		return $method->invokeArgs( $transient_manager, $array_parameter );
+		return $method->invokeArgs( $s3_helper, $array_parameter );
 	}
 }
