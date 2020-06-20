@@ -40,6 +40,7 @@ const REGIONS = [
 ];
 
 class S3_helper {
+	const REGION_NORTH_VIRGINIA = 'us-east-1';
 	private $s3;
 	private $options = array(
 		'Bucket' => '',
@@ -74,7 +75,7 @@ class S3_helper {
 	}
 
 	public function get_region($region) {
-		return in_array($region, REGIONS, true) ? $region : false;
+		return in_array($region, REGIONS, true) ? $region : self::REGION_NORTH_VIRGINIA;
 	}
 
 	public function set_option($option_array){
