@@ -5,6 +5,8 @@
  * @package static_press\includes
  */
 
+namespace static_press_s3\includes;
+
 /**
  * Myme type checker.
  */
