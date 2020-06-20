@@ -5,6 +5,8 @@
  * @package static_press\includes
  */
 
+namespace static_press_s3\includes;
+
 /**
  * Myme type checker.
  */
@@ -110,6 +112,6 @@ class Static_Press_S3_Mime_Type_Checker {
 	 */
 	private function get_extension() {
 		$path_parts = pathinfo( $this->path_to_file );
-		return array_key_exists( 'extension', $path_parts ) ? $path_parts['extension'] : '';
+		return array_key_exists( 'extension', $path_parts ) ? strtolower( $path_parts['extension'] ) : '';
 	}
 }

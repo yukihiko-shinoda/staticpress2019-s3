@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__).'/aws.phar');
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-mime-type-checker.php';
+use static_press_s3\includes\Static_Press_S3_Mime_Type_Checker;
 
 use Aws\Common\Aws;
 use Aws\Common\Enum\Region;
