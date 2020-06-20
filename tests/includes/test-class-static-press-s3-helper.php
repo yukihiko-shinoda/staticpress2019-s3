@@ -17,17 +17,37 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	const REGION_NORTH_VIRGINIA = 'us-east-1';
 	const REGION_TOKYO          = 'ap-northeast-1';
 	const REGION_OREGON         = 'us-west-2';
-	const ARRAY_REGION          = array(
-		'US_EAST_1',
-		'US_WEST_1',
-		'US_WEST_2',
-		'EU_WEST_1',
-		'AP_SOUTHEAST_1',
-		'AP_SOUTHEAST_2',
-		'AP_NORTHEAST_1',
-		'SA_EAST_1',
-		'CN_NORTH_1',
-		'US_GOV_WEST_1',
+	/**
+	 * Region list.
+	 * 
+	 * @see https://docs.aws.amazon.com/general/latest/gr/s3.html
+	 * @see https://docs.aws.amazon.com/govcloud-us/latest/UserGuide/using-govcloud-endpoints.html
+	 */
+	const ARRAY_REGION = array(
+		'af-south-1',
+		'ap-northeast-1',
+		'ap-northeast-2',
+		'ap-northeast-3',
+		'ap-southeast-1',
+		'ap-southeast-2',
+		'ap-east-1',
+		'ap-south-1',
+		'ca-central-1',
+		'cn-north-1',
+		'cn-northwest-1',
+		'eu-central-1',
+		'eu-west-1',
+		'eu-west-2',
+		'eu-west-3',
+		'eu-north-1',
+		'eu-south-1',
+		'us-east-1',
+		'us-east-2',
+		'us-west-1',
+		'us-west-2',
+		'sa-east-1',
+		'us-gov-west-1',
+		'us-gov-east-1',
 	);
 	/**
 	 * Test steps for init_s3().
@@ -39,14 +59,16 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * @param string $expected Expected.
 	 */
 	public function test_init_s3( $access_key, $secret_key, $region, $expected ) {
-		$s3_helper = new S3_helper();
-		$s3_client = $s3_helper->init_s3( $access_key, $secret_key, $region );
-		$config    = $s3_client->getConfig();
-		$this->assertEquals( $access_key, $config->get( 'key' ) );
-		$this->assertEquals( $secret_key, $config->get( 'secret' ) );
-		$this->assertEquals( $expected, $config->get( 'region' ) );
-		$this->assertEquals( 's3', $config->get( 'service' ) );
-		$this->assertEquals( '2006-03-01', $config->get( 'version' ) );
+		$s3_helper   = new S3_helper();
+		$s3_client   = $s3_helper->init_s3( $access_key, $secret_key, $region );
+		$credentials = $s3_client->getCredentials()->wait();
+		$config      = $s3_client->getConfig();
+		$this->assertEquals( $access_key, $credentials->getAccessKeyId() );
+		$this->assertEquals( $secret_key, $credentials->getSecretKey() );
+		$this->assertEquals( $expected, $s3_client->getRegion() );
+		$this->assertEquals( 's3', $config['signing_name'] );
+		$this->assertEquals( 's3v4', $config['signature_version'] );
+		$this->assertEquals( '2006-03-01', $s3_client->getApi()->getApiVersion() );
 	}
 
 	/**
@@ -66,8 +88,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	public function test_init_s3_default_region() {
 		$s3_helper = new S3_helper();
 		$s3_client = $s3_helper->init_s3( '', '' );
-		$config    = $s3_client->getConfig();
-		$this->assertEquals( self::REGION_TOKYO, $config->get( 'region' ) );
+		$this->assertEquals( self::REGION_TOKYO, $s3_client->getRegion() );
 	}
 
 	/**
