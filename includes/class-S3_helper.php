@@ -6,7 +6,14 @@ use static_press_s3\includes\Static_Press_S3_Mime_Type_Checker;
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 
+/**
+ * Region list.
+ * 
+ * @see https://docs.aws.amazon.com/general/latest/gr/s3.html
+ * @see https://docs.aws.amazon.com/govcloud-us/latest/UserGuide/using-govcloud-endpoints.html
+ */
 const REGIONS = [
+	'af-south-1',
     'ap-northeast-1',
     'ap-northeast-2',
     'ap-northeast-3',
@@ -15,17 +22,21 @@ const REGIONS = [
     'ap-east-1',
     'ap-south-1',
     'ca-central-1',
+	'cn-north-1',
+	'cn-northwest-1',
     'eu-central-1',
     'eu-west-1',
     'eu-west-2',
     'eu-west-3',
     'eu-north-1',
-    'me-south-1',
+	'eu-south-1',
     'us-east-1',
     'us-east-2',
     'us-west-1',
     'us-west-2',
     'sa-east-1',
+	'us-gov-west-1',
+	'us-gov-east-1',
 ];
 
 class S3_helper {
