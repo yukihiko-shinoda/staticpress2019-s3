@@ -3,18 +3,37 @@ require_once(dirname(__FILE__).'/aws.phar');
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-mime-type-checker.php';
 use static_press_s3\includes\Static_Press_S3_Mime_Type_Checker;
 
-use Aws\Common\Aws;
-use Aws\Common\Enum\Region;
-use Aws\S3\Enum\CannedAcl;
+use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
-use Guzzle\Http\EntityBody;
+
+const REGIONS = [
+    'ap-northeast-1',
+    'ap-northeast-2',
+    'ap-northeast-3',
+    'ap-southeast-1',
+    'ap-southeast-2',
+    'ap-east-1',
+    'ap-south-1',
+    'ca-central-1',
+    'eu-central-1',
+    'eu-west-1',
+    'eu-west-2',
+    'eu-west-3',
+    'eu-north-1',
+    'me-south-1',
+    'us-east-1',
+    'us-east-2',
+    'us-west-1',
+    'us-west-2',
+    'sa-east-1',
+];
 
 class S3_helper {
 	private $s3;
 	private $options = array(
 		'Bucket' => '',
 		'StorageClass' => 'STANDARD',
-		'ACL' => CannedAcl::PUBLIC_READ,
+		'ACL' => 'public-read',
 		);
 
 	function __construct($access_key = null, $secret_key = null, $region = null) {
@@ -23,36 +42,28 @@ class S3_helper {
 		}
 	}
 
-	// get S3 object
 	public function init_s3($access_key, $secret_key, $region = null){
 		if ( !isset($region) )
-			$region = Region::AP_NORTHEAST_1;
-		$s3 = Aws::factory(array(
-			'key' => $access_key,
-			'secret' => $secret_key,
+			$region = 'ap-northeast-1';
+	
+		$s3 = new Aws\S3\S3Client([
+			'credentials' => [
+				'key' => $access_key,
+				'secret' => $secret_key,
+			],
 			'region' => $this->get_region($region),
-			))->get('s3');
+			'version' => 'latest',
+		]);
 		$this->s3 = $s3;
 		return $s3;
 	}
 
 	public function get_regions() {
-		$regions = array();
-		foreach(Region::values() as $key => $val){
-			$region = str_replace('-','_',strtoupper($val));
-			if ( !in_array($region, $regions))
-				$regions[] = $region;
-		}
-		return $regions;
+		return REGIONS;
 	}
 
 	public function get_region($region) {
-		$region = str_replace('-','_',strtoupper($region));
-		$regions = Region::values();
-		return
-			isset($regions[$region])
-			? $regions[$region]
-			: false;
+		return in_array($region, REGIONS, true) ? $region : false;
 	}
 
 	public function set_option($option_array){
@@ -178,7 +189,7 @@ class S3_helper {
 	private function file_body($filename) {
 		$filebody =
 			file_exists($filename)
-			? EntityBody::factory(fopen($filename, 'r'))
+			? fopen($filename, 'r')
 			: null;
 		return $filebody;
  	}
