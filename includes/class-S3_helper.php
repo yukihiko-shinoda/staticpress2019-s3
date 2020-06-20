@@ -5,6 +5,7 @@ use static_press_s3\includes\Static_Press_S3_Mime_Type_Checker;
 
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
+use Aws\Exception\CredentialsException;
 
 /**
  * Region list.
@@ -49,23 +50,24 @@ class S3_helper {
 		);
 
 	function __construct($access_key = null, $secret_key = null, $region = null) {
-		if ($access_key && $secret_key) {
-			$this->init_s3($access_key, $secret_key, $region);
-		}
+		$this->init_s3($access_key, $secret_key, $region);
 	}
 
 	public function init_s3($access_key, $secret_key, $region = null){
 		if ( !isset($region) )
 			$region = 'ap-northeast-1';
-	
-		$s3 = new Aws\S3\S3Client([
-			'credentials' => [
-				'key' => $access_key,
-				'secret' => $secret_key,
-			],
-			'region' => $this->get_region($region),
+
+		$args = array(
+			'region'  => $this->get_region( $region ),
 			'version' => 'latest',
-		]);
+		);
+		if ( $access_key && $secret_key ) {
+			$args['credentials'] = array(
+				'key'    => $access_key,
+				'secret' => $secret_key,
+			);
+		}
+		$s3 = new Aws\S3\S3Client( $args );
 		$this->s3 = $s3;
 		return $s3;
 	}
@@ -160,6 +162,8 @@ class S3_helper {
 			$list_buckets = $this->s3->listBuckets();
 			return isset($list_buckets["Buckets"]) ? $list_buckets["Buckets"] : false;
 		} catch (S3Exception $e) {
+			return false;
+		} catch ( CredentialsException $e ) {
 			return false;
 		}
 	}
