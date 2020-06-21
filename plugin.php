@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name: StaticPress2019-S3
  * Plugin URI: https://github.com/megumiteam/staticpress-s3
- * Description: StaticPress -> S3.
+ * Description: Uploads dumped static site by StaticPress into S3.
  * Version: 0.1.1
  * Author: yshinoda, wokamoto, mogmet
  * Author URI: https://github.com/yukihiko-shinoda
