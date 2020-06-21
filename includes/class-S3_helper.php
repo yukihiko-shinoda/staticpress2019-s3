@@ -1,5 +1,10 @@
 <?php
-require_once(dirname(__FILE__).'/aws.phar');
+/**
+ * Class S3_helper
+ *
+ * @package static_press_s3\includes
+ */
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws.phar';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-mime-type-checker.php';
 use static_press_s3\includes\Static_Press_S3_Mime_Type_Checker;
 
@@ -8,55 +13,82 @@ use Aws\S3\Exception\S3Exception;
 use Aws\Exception\CredentialsException;
 
 /**
- * Region list.
- * 
- * @see https://docs.aws.amazon.com/general/latest/gr/s3.html
- * @see https://docs.aws.amazon.com/govcloud-us/latest/UserGuide/using-govcloud-endpoints.html
+ * S3 Helper.
  */
-const REGIONS = [
-	'af-south-1',
-    'ap-northeast-1',
-    'ap-northeast-2',
-    'ap-northeast-3',
-    'ap-southeast-1',
-    'ap-southeast-2',
-    'ap-east-1',
-    'ap-south-1',
-    'ca-central-1',
-	'cn-north-1',
-	'cn-northwest-1',
-    'eu-central-1',
-    'eu-west-1',
-    'eu-west-2',
-    'eu-west-3',
-    'eu-north-1',
-	'eu-south-1',
-    'us-east-1',
-    'us-east-2',
-    'us-west-1',
-    'us-west-2',
-    'sa-east-1',
-	'us-gov-west-1',
-	'us-gov-east-1',
-];
-
 class S3_helper {
+	/**
+	 * Region list.
+	 * 
+	 * @see https://docs.aws.amazon.com/general/latest/gr/s3.html
+	 * @see https://docs.aws.amazon.com/govcloud-us/latest/UserGuide/using-govcloud-endpoints.html
+	 */
+	const REGIONS               = array(
+		'af-south-1',
+		'ap-northeast-1',
+		'ap-northeast-2',
+		'ap-northeast-3',
+		'ap-southeast-1',
+		'ap-southeast-2',
+		'ap-east-1',
+		'ap-south-1',
+		'ca-central-1',
+		'cn-north-1',
+		'cn-northwest-1',
+		'eu-central-1',
+		'eu-west-1',
+		'eu-west-2',
+		'eu-west-3',
+		'eu-north-1',
+		'eu-south-1',
+		'us-east-1',
+		'us-east-2',
+		'us-west-1',
+		'us-west-2',
+		'sa-east-1',
+		'us-gov-west-1',
+		'us-gov-east-1',
+	);
 	const REGION_NORTH_VIRGINIA = 'us-east-1';
+	/**
+	 * S3 client.
+	 * 
+	 * @var S3Client
+	 */
 	private $s3;
+	/**
+	 * Options.
+	 * 
+	 * @var array
+	 */
 	private $options = array(
-		'Bucket' => '',
+		'Bucket'       => '',
 		'StorageClass' => 'STANDARD',
-		'ACL' => 'public-read',
-		);
+		'ACL'          => 'public-read',
+	);
 
-	function __construct($access_key = null, $secret_key = null, $region = null) {
-		$this->init_s3($access_key, $secret_key, $region);
+	/**
+	 * Constructor.
+	 * 
+	 * @param string $access_key Access key.
+	 * @param string $secret_key Secret key.
+	 * @param string $region     Region.
+	 */
+	public function __construct( $access_key = null, $secret_key = null, $region = null ) {
+		$this->init_s3( $access_key, $secret_key, $region );
 	}
 
-	public function init_s3($access_key, $secret_key, $region = null){
-		if ( !isset($region) )
+	/**
+	 * Inits S3 instance.
+	 * 
+	 * @param string $access_key Access key.
+	 * @param string $secret_key Secret key.
+	 * @param string $region     Region.
+	 * @return S3Client S3 client.
+	 */
+	public function init_s3( $access_key, $secret_key, $region = null ) {
+		if ( ! isset( $region ) ) {
 			$region = 'ap-northeast-1';
-
+		}
 		$args = array(
 			'region'  => $this->get_region( $region ),
 			'version' => 'latest',
@@ -72,45 +104,79 @@ class S3_helper {
 		return $s3;
 	}
 
+	/**
+	 * Gets regions.
+	 * 
+	 * @return string[] Array of region.
+	 */
 	public function get_regions() {
-		return REGIONS;
+		return self::REGIONS;
 	}
 
-	public function get_region($region) {
-		return in_array($region, REGIONS, true) ? $region : self::REGION_NORTH_VIRGINIA;
+	/**
+	 * Gets region.
+	 * 
+	 * @param array $region Region.
+	 * @return string Region.
+	 */
+	public function get_region( $region ) {
+		return in_array( $region, self::REGIONS, true ) ? $region : self::REGION_NORTH_VIRGINIA;
 	}
 
+	/**
+	 * Sets option.
+	 * 
+	 * @param array $option_array Option array.
+	 */
 	public function set_option($option_array){
 		if (!is_array($option_array))
 			return false;
 		$this->options = array_merge($this->options, $option_array);
 	}
 
-	// S3 Upload
-	public function upload($filename, $upload_path = null, $bucket = null) {
-		if (!file_exists($filename) || !$this->s3)
+	/**
+	 * Uploads.
+	 * 
+	 * @param string $filename    Filename.
+	 * @param string $upload_path Upload path.
+	 * @param string $bucket      Bucket.
+	 */
+	public function upload( $filename, $upload_path = null, $bucket = null ) {
+		if ( ! file_exists( $filename ) || ! $this->s3 ) {
 			return false;
-
+		}
 		try {
-			if (!$upload_path)
+			if ( ! $upload_path ) {
 				$upload_path = $filename;
-			$args = array_merge($this->options, array(
-				'Key'         => $upload_path,
-				'Body'        => $this->file_body($filename),
-				'ContentType' => $this->mime_type($filename),
-				));
-			if (isset($bucket))
+			}
+			$args = array_merge(
+				$this->options,
+				array(
+					'Key'         => $upload_path,
+					'Body'        => $this->file_body( $filename ),
+					'ContentType' => $this->mime_type( $filename ),
+				)
+			);
+			if ( isset( $bucket ) ) {
 				$args['Bucket'] = $bucket;
-			if (!isset($args['Bucket']))
+			}
+			if ( ! isset( $args['Bucket'] ) ) {
 				return false;
-			$response = $this->s3->putObject($args);
+			}
+			$response = $this->s3->putObject( $args );
 			return $response;
-		} catch (S3Exception $e) {
+		} catch ( S3Exception $e ) {
 			return false;
 		}
 	}
 
-	// S3 Download
+	/**
+	 * Downloads.
+	 * 
+	 * @param string $key           Key.
+	 * @param string $download_path Download path.
+	 * @param string $bucket        Bucket.
+	 */
 	public function download($key, $download_path = null, $bucket = null) {
 		if (!$this->s3)
 			return false;
@@ -134,7 +200,12 @@ class S3_helper {
 		}
 	}
 
-	// S3 Delete
+	/**
+	 * Deletes.
+	 * 
+	 * @param string $upload_path Upload path.
+	 * @param string $bucket      Bucket.
+	 */
 	public function delete($upload_path, $bucket = null) {
 		if (!$this->s3)
 			return false;
@@ -154,26 +225,40 @@ class S3_helper {
 		}
 	}
 
-	// list buckets
+	/**
+	 * Lists buckets.
+	 * 
+	 * @return array[]|false List of buckets when succeed, otherwise false.
+	 */
 	public function list_buckets() {
-		if (!isset($this->s3))
+		if ( ! isset( $this->s3 ) ) {
 			return false;
+		}
 		try {
 			$list_buckets = $this->s3->listBuckets();
-			return isset($list_buckets["Buckets"]) ? $list_buckets["Buckets"] : false;
-		} catch (S3Exception $e) {
+			return isset( $list_buckets['Buckets'] ) ? $list_buckets['Buckets'] : false;
+		} catch ( S3Exception $e ) {
 			return false;
 		} catch ( CredentialsException $e ) {
 			return false;
 		}
 	}
 
-	// return current bucket
+	/**
+	 * Returns current bucket.
+	 * 
+	 * @return string|false Current bucket when bucket is set, otherwise false.
+	 */
 	public function current_bucket(){
 		return isset($this->options['Bucket']) ? $this->options['Bucket'] : false;
 	}
 
-	// set current bucket
+	/**
+	 * Sets current bucket.
+	 * 
+	 * @param string $bucket Bucket.
+	 * @return string|false Bucket when succeed, otherwise false.
+	 */
 	public function set_current_bucket($bucket){
 		if ($this->bucket_exists($bucket)) {
 			$this->options['Bucket'] = $bucket;
@@ -183,7 +268,13 @@ class S3_helper {
 		}
 	}
 
-	// does Bucket exists
+	/**
+	 * Does bucket exists.
+	 * 
+	 * @param string $bucket    Bucket.
+	 * @param bool   $accept403 Whether accept 403 error or not.
+	 * @return bool Whether bucket exist or not.
+	 */
 	public function bucket_exists($bucket = null, $accept403 = true) {
 		if (!isset($this->s3))
 			return false;
@@ -192,7 +283,12 @@ class S3_helper {
 		return $bucket ? $this->s3->doesBucketExist($bucket, $accept403) : false;
 	}
 
-	// does Object exists
+	/**
+	 * Does object exists.
+	 * 
+	 * @param string $key Key.
+	 * @return bool Whether object exist or not.
+	 */
 	public function object_exists($key) {
 		if (!isset($this->s3))
 			return false;
@@ -201,7 +297,12 @@ class S3_helper {
 		return $this->s3->doesObjectExist($this->options['Bucket'], $key);
 	}
 
-	// get file_body
+	/**
+	 * Gets file_body.
+	 * 
+	 * @param string $filename File name.
+	 * @return string File body.
+	 */
 	private function file_body($filename) {
 		$filebody =
 			file_exists($filename)
