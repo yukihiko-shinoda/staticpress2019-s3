@@ -1,6 +1,6 @@
 <?php
 /**
- * Class S3_helper
+ * Class Static_Press_S3_Helper
  *
  * @package static_press_s3\includes
  */
@@ -15,7 +15,7 @@ use Aws\Exception\CredentialsException;
 /**
  * S3 Helper.
  */
-class S3_helper {
+class Static_Press_S3_Helper {
 	/**
 	 * Region list.
 	 * 

@@ -2,7 +2,7 @@
 /**
  * Class Plugin_Test
  *
- * @package static_press\tests
+ * @package static_press_s3\tests
  */
 
 /**
@@ -41,8 +41,8 @@ class Plugin_Test extends \WP_UnitTestCase {
 		require $this->path_to_plugin_file;
 		$this->assertEquals( 10, has_action( 'plugins_loaded', 'static_press_s3_run' ) );
 		do_action( 'plugins_loaded' );
-		$this->assertTrue( class_exists( 'S3_helper' ) );
-		$this->assertTrue( class_exists( 'staticpress_s3_admin' ) );
-		$this->assertTrue( class_exists( 'staticpress_s3' ) );
+		$this->assertTrue( class_exists( 'Static_Press_S3_Helper' ) );
+		$this->assertTrue( class_exists( 'Static_Press_S3_Admin' ) );
+		$this->assertTrue( class_exists( 'Static_Press_S3' ) );
 	}
 }

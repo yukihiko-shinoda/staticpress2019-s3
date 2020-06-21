@@ -55,9 +55,9 @@ if ( ! function_exists( 'static_press_s3_run' ) ) {
 		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
 		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-admin.php';
 		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3.php';
-		new staticpress_s3( staticpress_s3_admin::get_option() );
+		new Static_Press_S3( Static_Press_S3_Admin::get_option() );
 		if ( is_admin() ) {
-			new staticpress_s3_admin();
+			new Static_Press_S3_Admin();
 		}
 	};
 }

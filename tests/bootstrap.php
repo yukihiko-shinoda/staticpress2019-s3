@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file
  *
- * @package Staticpress_S3
+ * @package static_press_s3
  */
 
 $static_press_s3_tests_dir = getenv( 'WP_TESTS_DIR' );

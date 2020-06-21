@@ -1,5 +1,5 @@
 <?php
-class staticpress_s3 {
+class Static_Press_S3 {
 	static $debug_mode  = false;
     static $instance;
 
@@ -31,7 +31,7 @@ class staticpress_s3 {
 			return $this->s3;
 		}
 		if ($this->options) {
-			$s3 = new S3_helper(
+			$s3 = new Static_Press_S3_Helper(
 				isset($this->options['access_key']) ? $this->options['access_key'] : null,
 				isset($this->options['secret_key']) ? $this->options['secret_key'] : null,
 				isset($this->options['region'])     ? $this->options['region']     : null

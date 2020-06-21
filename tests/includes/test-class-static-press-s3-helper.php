@@ -60,7 +60,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * @param string $expected Expected.
 	 */
 	public function test_init_s3( $access_key, $secret_key, $region, $expected ) {
-		$s3_helper   = new S3_helper();
+		$s3_helper   = new Static_Press_S3_Helper();
 		$s3_client   = $s3_helper->init_s3( $access_key, $secret_key, $region );
 		$credentials = $s3_client->getCredentials()->wait();
 		$config      = $s3_client->getConfig();
@@ -87,7 +87,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * Default region should be "ap-northeast-1".
 	 */
 	public function test_init_s3_default_region() {
-		$s3_helper = new S3_helper();
+		$s3_helper = new Static_Press_S3_Helper();
 		$s3_client = $s3_helper->init_s3( '', '' );
 		$this->assertEquals( self::REGION_TOKYO, $s3_client->getRegion() );
 	}
@@ -96,7 +96,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * Function get_regions() should return appropriate array.
 	 */
 	public function test_get_regions() {
-		$s3_helper = new S3_helper();
+		$s3_helper = new Static_Press_S3_Helper();
 		$this->assertEquals( self::ARRAY_REGION, $s3_helper->get_regions() );
 	}
 
@@ -108,7 +108,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * @param string $expected Expected.
 	 */
 	public function test_get_region( $argument, $expected ) {
-		$s3_helper = new S3_helper();
+		$s3_helper = new Static_Press_S3_Helper();
 		$this->assertEquals( $expected, $s3_helper->get_region( $argument ) );
 	}
 
@@ -182,7 +182,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * @return S3Client S3 helper partial mock.
 	 */
 	private function create_s3_client_partial_mock( $expected, $response ) {
-		$s3_helper      = new S3_helper();
+		$s3_helper      = new Static_Press_S3_Helper();
 		$mock_s3_client = Mockery::mock( $s3_helper->init_s3( '', '' ) );
 		$mock_s3_client->shouldReceive( 'putObject' )
 		->with( $expected )
@@ -194,10 +194,10 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * Creates S3 helper partial mock which S3 client replaced.
 	 * 
 	 * @param string $s3_client S3 client.
-	 * @return S3_helper S3 helper partial mock.
+	 * @return Static_Press_S3_Helper S3 helper partial mock.
 	 */
 	private function create_s3_helper_partial_mock( $s3_client ) {
-		$s3_helper           = new S3_helper();
+		$s3_helper           = new Static_Press_S3_Helper();
 		$reflection          = new ReflectionClass( $s3_helper );
 		$reflection_property = $reflection->getProperty( 's3' );
 		$reflection_property->setAccessible( true );
@@ -261,7 +261,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * @param array  $array_parameter Array of parameter.
 	 */
 	private function call_private_method( $method_name, $array_parameter ) {
-		$s3_helper  = new S3_helper();
+		$s3_helper  = new Static_Press_S3_Helper();
 		$reflection = new \ReflectionClass( get_class( $s3_helper ) );
 		$method     = $reflection->getMethod( $method_name );
 		$method->setAccessible( true );
