@@ -3,12 +3,22 @@
  * StaticPress2019-S3
  * 
  * @package     static_press_s3
+ * @author      Yukihiko Shinoda <yuk.hik.future@gmail.com>
+ * @author      wokamoto
+ * @author      mogmet
+ * @author      Yoshihiro Ibayashi
+ * @author      megane9988
+ * @author      yuiwasaki
+ * @copyright   2013 wokamoto
+ * @license     GPL-2.0-or-later
+ * 
+ * @wordpress-plugin
  * Plugin Name: StaticPress2019-S3
- * Author: wokamoto
  * Plugin URI: https://github.com/megumiteam/staticpress-s3
- * Description: StaticPress -> S3.
+ * Description: Uploads dumped static site by StaticPress into S3.
  * Version: 0.1.1
- * Author URI: http://www.digitalcube.jp/
+ * Author: yshinoda, wokamoto, mogmet
+ * Author URI: https://github.com/yukihiko-shinoda
  * Text Domain: static-press-S3
  * Domain Path: /languages
  * 
