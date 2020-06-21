@@ -52,9 +52,9 @@ if ( ! function_exists( 'static_press_s3_run' ) ) {
 		if ( ! isset( $staticpress ) ) {
 			return;
 		}
-		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-S3_helper.php';
-		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-staticpress_s3_admin.php';
-		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-staticpress_s3.php';
+		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
+		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-admin.php';
+		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3.php';
 		new staticpress_s3( staticpress_s3_admin::get_option() );
 		if ( is_admin() ) {
 			new staticpress_s3_admin();

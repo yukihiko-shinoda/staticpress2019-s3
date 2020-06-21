@@ -5,8 +5,8 @@
  * @package static_press\tests\includes
  */
 
-require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-staticpress_s3.php';
-require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-staticpress_s3_admin.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-admin.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
 use static_press_s3\tests\testlibraries\Path_Creator;
 /**
