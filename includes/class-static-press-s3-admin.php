@@ -8,7 +8,7 @@
 /**
  * StaticPress S3 Admin page.
  */
-class staticpress_s3_admin {
+class Static_Press_S3_Admin {
 	const OPTION_KEY   = 'staticpress_s3';
 	const OPTION_PAGE  = 'staticpress_s3';
 	const TEXT_DOMAIN  = 'staticpress_s3';
@@ -40,7 +40,7 @@ class staticpress_s3_admin {
 		self::$instance = $this;
 
 		$this->options         = $this->get_option();
-		$this->plugin_basename = staticpress_s3::plugin_basename();
+		$this->plugin_basename = Static_Press_S3::plugin_basename();
 		add_action( 'StaticPress::options_save', array( $this, 'options_save' ) );
 		add_action( 'StaticPress::options_page', array( $this, 'options_page' ) );
 	}
@@ -145,7 +145,7 @@ class staticpress_s3_admin {
 		$title = __( 'StaticPress S3 Option', self::TEXT_DOMAIN );
 
 		// Get S3 Object.
-		$s3      = new S3_helper(
+		$s3      = new Static_Press_S3_Helper(
 			! empty( $this->options['access_key'] ) ? $this->options['access_key'] : null,
 			! empty( $this->options['secret_key'] ) ? $this->options['secret_key'] : null,
 			! empty( $this->options['region'] ) ? $this->options['region'] : null

@@ -5,8 +5,8 @@
  * @package static_press\tests\includes
  */
 
-require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-staticpress_s3.php';
-require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-staticpress_s3_admin.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-admin.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
 use static_press_s3\tests\testlibraries\Path_Creator;
 /**
@@ -20,7 +20,7 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 	 */
 	public function test_init_s3_empty_options() {
 		$this->expectOutputRegex( $this->create_regex( '', '' ) );
-		$admin = new staticpress_s3_admin();
+		$admin = new Static_Press_S3_Admin();
 		$admin->options_page();
 	}
 
@@ -29,7 +29,7 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 	 */
 	public function test_init_s3() {
 		update_option(
-			staticpress_s3_admin::OPTION_KEY,
+			Static_Press_S3_Admin::OPTION_KEY,
 			array(
 				'access_key' => 'accessKey',
 				'secret_key' => 'secretKey',
@@ -38,7 +38,7 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 			)
 		);
 		$this->expectOutputRegex( $this->create_regex( 'accessKey', 'secretKey' ) );
-		$admin = new staticpress_s3_admin();
+		$admin = new Static_Press_S3_Admin();
 		$admin->options_page();
 	}
 

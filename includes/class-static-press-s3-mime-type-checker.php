@@ -2,7 +2,7 @@
 /**
  * Class Static_Press_S3_Mime_Type_Checker
  *
- * @package static_press\includes
+ * @package static_press_s3\includes
  */
 
 namespace static_press_s3\includes;
