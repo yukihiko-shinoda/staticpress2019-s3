@@ -5,7 +5,9 @@
  * @package static_press_s3\includes
  */
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws.phar';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-finfo-factory.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-mime-type-checker.php';
+use static_press_s3\includes\Static_Press_S3_Finfo_Factory;
 use static_press_s3\includes\Static_Press_S3_Mime_Type_Checker;
 
 use Aws\S3\S3Client;
@@ -320,10 +322,9 @@ class Static_Press_S3_Helper {
 	private function mime_type( $filename ) {
 		static $info;
 		if ( ! isset( $info ) ) {
-			$magic_file = '/usr/share/misc/magic';
-			$info       = file_exists( $magic_file )
-			? new FInfo( FILEINFO_MIME_TYPE, $magic_file )
-			: new FInfo( FILEINFO_MIME_TYPE );
+			$magic_file    = '/usr/share/misc/magic';
+			$finfo_factory = new Static_Press_S3_Finfo_Factory();
+			$info          = $finfo_factory->create( $magic_file );
 		}
 		$mime_type =
 			file_exists( $filename )
