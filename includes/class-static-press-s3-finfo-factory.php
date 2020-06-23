@@ -23,9 +23,13 @@ class Static_Press_S3_Finfo_Factory {
 	 *                           Passing NULL or an empty string will be equivalent to the default value.
 	 */
 	public function create( $magic_file ) {
-		return file_exists( $magic_file )
-		? $this->create_with_file( $magic_file )
-		: $this->create_without_file();
+		switch ( true ) {
+			case false !== getenv( 'MAGIC' ) && file_exists( getenv( 'MAGIC' ) ):
+			case ! file_exists( $magic_file ):
+				return $this->create_without_file();
+			default:
+				return $this->create_with_file( $magic_file );
+		}
 	}
 
 	/**
