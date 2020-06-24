@@ -16,24 +16,32 @@ Uploads dumped static site by StaticPress into S3.
 
 This plugin is a revival of [StaticPress-S3](https://github.com/megumiteam/staticpress-s3) by CI / CD pipeline and TDD, and maintained by volunteers instead of the original no longer maintained.
 
-## 使い方
+## Installation
 
-1. git clone https://github.com/yukihiko-shinoda/staticpress-s3
-2. staticpress-s3をzipにする
-3. Wordpressのページにログイン
-4. [プラグイン] -> [新規追加] -> [プラグインのアップロード]で上で作成したzipをアップロード
-5. プラグインでStaticPressをインストール
-6. プラグインを有効にする
-7. [StaticPress] -> [StaticPress設定]を選択
-8. 静的サイトにs3で公開するURLを設定
-9. 出力先ディレクトリを適当なディレクトリに設定
-10. [変更を保持]をクリック
-11. StaticPress S3 OptionにAWSのアクセスキーとシークレットキーとリージョンを設定
-12. [変更を保持]をクリック
-13. S3のバケットを選択
-14. [StaticPress] -> [StaticPress]を選択
-15. [再構築]をクリック
+1. Go to Admin page on your WordPress.
+2. Click [Plugins] -> [Add New].
+3. Search by keyword: `staticpress2019`.
+4. Click [Install Now] button for `StaticPress2019` and `StaticPress2019-S3`.
+5. Click [Activate] button for `StaticPress2019` and `StaticPress2019-S3`.
 
-## 問題
-- Dockerで作成した場合など実際のポート番号とサーバー内のポート番号が違う場合にStaticPress側でクローリングが正しく動作しない
+## How to use
 
+1. Click [StaticPress2019] -> [StaticPress2019 Options]
+2. Set [Static URL] as URL to publish in S3
+3. Set [Save DIR (Document root)] as appropriate directory to dump static files
+4. Click [Save Changes]
+5. Set [AWS Access Key], [AWS Secret Key], [AWS Region] in [StaticPress S3 Option]
+6. Click [Save Changes]
+7. Choose [S3 Bucket]
+8. Click [Save Changes]
+9. Click [StaticPress2019] -> [StaticPress2019]
+10. Click [Rebuild]
+
+## Frequently Asked Questions
+
+<!-- markdownlint-disable no-trailing-punctuation -->
+### Why mime type of file in S3 is not correct?
+<!-- markdownlint-enable no-trailing-punctuation -->
+
+This plugin uses [magic file](https://unix.stackexchange.com/questions/393288/explain-please-what-is-a-magic-file-in-unix) to detect mime type.
+If mime type is not correct, you can specify different magic file from default by using environment variable `MAGIC`.
