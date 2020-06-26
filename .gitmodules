@@ -1,0 +1,3 @@
+[submodule "includes/aws-sdk-php-from-zip"]
+	path = includes/aws-sdk-php-from-zip
+	url = https://github.com/yukihiko-shinoda/aws-sdk-php-from-zip.git

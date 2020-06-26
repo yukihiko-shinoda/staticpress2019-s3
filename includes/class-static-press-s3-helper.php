@@ -4,7 +4,7 @@
  *
  * @package static_press_s3\includes
  */
-require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws.phar';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws-sdk-php-from-zip/aws-autoloader.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-finfo-factory.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-mime-type-checker.php';
 use static_press_s3\includes\Static_Press_S3_Finfo_Factory;

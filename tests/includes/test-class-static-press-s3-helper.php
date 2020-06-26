@@ -5,7 +5,7 @@
  * @package static_press\tests\includes
  */
 
-require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws.phar';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws-sdk-php-from-zip/aws-autoloader.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
 use static_press_s3\tests\testlibraries\Path_Creator;
