@@ -49,8 +49,9 @@ class Static_Press_S3_Helper {
 		'sa-east-1',
 		'us-gov-west-1',
 		'us-gov-east-1',
+		'other'
 	);
-	const REGION_NORTH_VIRGINIA = 'us-east-1';
+	const REGION_NORTH_VIRGINIA = 'other';
 	/**
 	 * S3 client.
 	 * 
@@ -75,8 +76,8 @@ class Static_Press_S3_Helper {
 	 * @param string $secret_key Secret key.
 	 * @param string $region     Region.
 	 */
-	public function __construct( $access_key = null, $secret_key = null, $region = null ) {
-		$this->init_s3( $access_key, $secret_key, $region );
+	public function __construct( $access_key = null, $secret_key = null, $endpoint, $region = null ) {
+		$this->init_s3( $access_key, $secret_key, $endpoint, $region );
 	}
 
 	/**
@@ -87,14 +88,26 @@ class Static_Press_S3_Helper {
 	 * @param string $region     Region.
 	 * @return S3Client S3 client.
 	 */
-	public function init_s3( $access_key, $secret_key, $region = null ) {
+	public function init_s3( $access_key, $secret_key, $endpoint, $region = null ) {
 		if ( ! isset( $region ) ) {
-			$region = 'ap-northeast-1';
+			$region = '';
 		}
-		$args = array(
-			'region'  => $this->get_region( $region ),
-			'version' => 'latest',
-		);
+
+		if ( $region == 'other'){
+			$args = array(
+				'region' => 'other',
+				'endpoint' => $endpoint,
+				'version'  => 'latest',
+				'use_path_style_endpoint' => true,
+			);
+
+		}
+		else {
+			$args = array(
+				'region'  => $this->get_region( $region ),
+				'version' => 'latest',
+			);
+		};
 		if ( $access_key && $secret_key ) {
 			$args['credentials'] = array(
 				'key'    => $access_key,

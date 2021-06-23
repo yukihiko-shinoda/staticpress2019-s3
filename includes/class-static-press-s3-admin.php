@@ -56,6 +56,7 @@ class Static_Press_S3_Admin {
 			'secret_key' => __( 'AWS Secret Key',  self::TEXT_DOMAIN ),
 			'region'     => __( 'AWS Region',  self::TEXT_DOMAIN ),
 			'bucket'     => __( 'S3 Bucket',  self::TEXT_DOMAIN ),
+			'endpoint'     => __( 'S3 Endpoint',  self::TEXT_DOMAIN ),
 		);
 	}
 
@@ -148,6 +149,7 @@ class Static_Press_S3_Admin {
 		$s3      = new Static_Press_S3_Helper(
 			! empty( $this->options['access_key'] ) ? $this->options['access_key'] : null,
 			! empty( $this->options['secret_key'] ) ? $this->options['secret_key'] : null,
+			! empty( $this->options['endpoint'] ) ? $this->options['endpoint'] : null,
 			! empty( $this->options['region'] ) ? $this->options['region'] : null
 		);
 		$regions = $this->regions;
@@ -155,6 +157,7 @@ class Static_Press_S3_Admin {
 		if ( $s3 ) {
 			$regions = $s3->get_regions();
 			$buckets = $s3->list_buckets();
+			
 		}
 		if ( ! $buckets ) {
 			unset( $option_keys['bucket'] );
