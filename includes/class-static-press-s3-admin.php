@@ -56,7 +56,7 @@ class Static_Press_S3_Admin {
 			'secret_key' => __( 'AWS Secret Key',  self::TEXT_DOMAIN ),
 			'region'     => __( 'AWS Region',  self::TEXT_DOMAIN ),
 			'bucket'     => __( 'S3 Bucket',  self::TEXT_DOMAIN ),
-			'endpoint'     => __( 'S3 Endpoint',  self::TEXT_DOMAIN ),
+			'endpoint'   => __( 'S3 Endpoint',  self::TEXT_DOMAIN ),
 		);
 	}
 
