@@ -74,6 +74,7 @@ class Static_Press_S3_Helper {
 	 * 
 	 * @param string $access_key Access key.
 	 * @param string $secret_key Secret key.
+	 * @param string $endpoint   S3 compati endpointURL.
 	 * @param string $region     Region.
 	 */
 	public function __construct( $access_key = null, $secret_key = null, $endpoint, $region = null ) {
@@ -85,6 +86,7 @@ class Static_Press_S3_Helper {
 	 * 
 	 * @param string $access_key Access key.
 	 * @param string $secret_key Secret key.
+	 * @param string $endpoint   S3 compati endpointURL.
 	 * @param string $region     Region.
 	 * @return S3Client S3 client.
 	 */
