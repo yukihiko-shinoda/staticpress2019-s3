@@ -51,7 +51,7 @@ class Static_Press_S3_Helper {
 		'us-gov-east-1',
 		'other'
 	);
-	const REGION_NORTH_VIRGINIA = 'other';
+	const REGION_NORTH_VIRGINIA = 'us-east-1';
 	/**
 	 * S3 client.
 	 * 
@@ -90,7 +90,7 @@ class Static_Press_S3_Helper {
 	 */
 	public function init_s3( $access_key, $secret_key, $endpoint, $region = null ) {
 		if ( ! isset( $region ) ) {
-			$region = '';
+			$region = 'ap-northeast-1';
 		}
 
 		if ( $region == 'other'){

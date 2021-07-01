@@ -55,8 +55,8 @@ class Static_Press_S3_Admin {
 			'access_key' => __( 'AWS Access Key',  self::TEXT_DOMAIN ),
 			'secret_key' => __( 'AWS Secret Key',  self::TEXT_DOMAIN ),
 			'region'     => __( 'AWS Region',  self::TEXT_DOMAIN ),
-			'bucket'     => __( 'S3 Bucket',  self::TEXT_DOMAIN ),
 			'endpoint'   => __( 'S3 Endpoint',  self::TEXT_DOMAIN ),
+			'bucket'     => __( 'S3 Bucket',  self::TEXT_DOMAIN ),
 		);
 	}
 
@@ -157,7 +157,9 @@ class Static_Press_S3_Admin {
 		if ( $s3 ) {
 			$regions = $s3->get_regions();
 			$buckets = $s3->list_buckets();
-			
+		}
+		if ( $this->options['region'] != 'other'){
+			unset($option_keys['endpoint']);
 		}
 		if ( ! $buckets ) {
 			unset( $option_keys['bucket'] );
