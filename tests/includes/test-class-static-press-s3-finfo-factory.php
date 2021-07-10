@@ -6,8 +6,10 @@
  */
 
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-finfo-factory.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-magic-for-test.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
 use static_press_s3\includes\Static_Press_S3_Finfo_Factory;
+use static_press_s3\tests\testlibraries\Magic_For_Test;
 use static_press_s3\tests\testlibraries\Path_Creator;
 /**
  * Static_Press_S3_Helper test case.
@@ -37,7 +39,7 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 		set_error_handler( array( $this, 'handleError' ) );
 		$this->temporary_magic_file = Path_Creator::create_file_path( 'magic' );
 		if ( file_exists( $this->temporary_magic_file ) ) {
-			rmdir( $this->temporary_magic_file );
+			$this->rm( $this->temporary_magic_file );
 		}
 		putenv( 'MAGIC' );
 	}
@@ -46,16 +48,18 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 	 * Remove temoporary magic file.
 	 */
 	public function tearDown() {
-		mockery::close();
+		Mockery::close();
 		if ( file_exists( $this->temporary_magic_file ) ) {
-			rmdir( $this->temporary_magic_file );
+			$this->rm( $this->temporary_magic_file );
 		}
 		restore_error_handler();
 		parent::tearDown();
 	}
 
 	/**
-	 * Function create() should call create_without_file() when magic file does not exist.
+	 * Function create() should call create_without_file() when:
+	 * - environment variable "MAGIC" is not set
+	 * - Magic file from argument does not exist
 	 *
 	 * @throws ReflectionException When fail to create ReflectionClass instance.
 	 */
@@ -68,12 +72,14 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Function create() should call create_with_file() when magic file does exists.
+	 * Function create() should call create_with_file() when:
+	 * - environment variable "MAGIC" is not set
+	 * - Magic file from argument exists
 	 *
 	 * @throws ReflectionException When fail to create ReflectionClass instance.
 	 */
 	public function test_create_finfo_with_magic_file() {
-		$magic_file = '/usr/share/misc/magic';
+		$magic_file = Magic_For_Test::get();
 		$finfo      = new FInfo( FILEINFO_MIME_TYPE, $magic_file );
 		$mock       = $this->should_call_create_with_file( $magic_file, $finfo );
 		$result     = $mock->create( $magic_file );
@@ -81,12 +87,14 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Function create() should call create_without_file() when magic file does not exist.
+	 * Function create() should call create_without_file() when:
+	 * - environment variable "MAGIC" is set and magic file exists
+	 * - Magic file from argument does not exist
 	 *
 	 * @throws ReflectionException When fail to create ReflectionClass instance.
 	 */
 	public function test_create_finfo_without_magic_file_with_file_in_environment_variable() {
-		$this->recurse_copy( '/usr/share/misc/magic', $this->temporary_magic_file );
+		$this->copy( Magic_For_Test::get(), $this->temporary_magic_file );
 		putenv( "MAGIC=$this->temporary_magic_file" );
 		$magic_file = '*/:<>?\|';
 		$finfo      = new FInfo( FILEINFO_MIME_TYPE );
@@ -96,14 +104,16 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Function create() should call create_with_file() when magic file does exists.
+	 * Function create() should call create_without_file() when:
+	 * - environment variable "MAGIC" is set and magic file exists
+	 * - Magic file from argument exists
 	 *
 	 * @throws ReflectionException When fail to create ReflectionClass instance.
 	 */
 	public function test_create_finfo_with_magic_file_with_file_in_environment_variable() {
-		$this->recurse_copy( '/usr/share/misc/magic', $this->temporary_magic_file );
+		$this->copy( Magic_For_Test::get(), $this->temporary_magic_file );
 		putenv( "MAGIC=$this->temporary_magic_file" );
-		$magic_file = '/usr/share/misc/magic';
+		$magic_file = Magic_For_Test::get();
 		$finfo      = new FInfo( FILEINFO_MIME_TYPE );
 		$mock       = $this->should_call_create_without_file( $finfo );
 		$result     = $mock->create( $magic_file );
@@ -111,7 +121,9 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Function create() should call create_without_file() when magic file does not exist.
+	 * Function create() should throw exception when:
+	 * - environment variable "MAGIC" is set and magic file does not exist
+	 * - Magic file from argument does not exist
 	 *
 	 * @throws ReflectionException When fail to create ReflectionClass instance.
 	 */
@@ -130,13 +142,15 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Function create() should call create_with_file() when magic file does exists.
+	 * Function create() should call create_with_file() when:
+	 * - environment variable "MAGIC" is set and magic file does not exist
+	 * - Magic file from argument exists
 	 *
 	 * @throws ReflectionException When fail to create ReflectionClass instance.
 	 */
 	public function test_create_finfo_with_magic_file_without_file_in_environment_variable() {
 		putenv( "MAGIC=$this->temporary_magic_file" );
-		$magic_file = '/usr/share/misc/magic';
+		$magic_file = Magic_For_Test::get();
 		$finfo      = new FInfo( FILEINFO_MIME_TYPE, $magic_file );
 		$mock       = $this->should_call_create_with_file( $magic_file, $finfo );
 		$result     = $mock->create( $magic_file );
@@ -175,6 +189,23 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Copies file or directory.
+	 * 
+	 * @param string $src Source.
+	 * @param string $dst Destination.
+	 */
+	private function copy( $src, $dst ) {
+		switch ( true ) {
+			case is_dir( $src ):
+				$this->recurse_copy( $src, $dst );
+				break;
+			default:
+				copy( $src, $dst );
+				break;
+		}
+	}
+
+	/**
 	 * Copies recursivery.
 	 * 
 	 * @param string $src Source.
@@ -196,6 +227,21 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 		closedir( $dir );
 	}
 
+	/**
+	 * Removes file or directory.
+	 * 
+	 * @param string $src Source.
+	 */
+	private function rm( $src ) {
+		switch ( true ) {
+			case is_dir( $src ):
+				rmdir( $src );
+				break;
+			default:
+				unlink( $src );
+				break;
+		}
+	}
 	/**
 	 * Checks error.
 	 * 

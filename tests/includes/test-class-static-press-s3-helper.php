@@ -7,7 +7,9 @@
 
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws-sdk-php-from-zip/aws-autoloader.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-magic-for-test.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
+use static_press_s3\tests\testlibraries\Magic_For_Test;
 use static_press_s3\tests\testlibraries\Path_Creator;
 /**
  * Static_Press_S3_Helper test case.
@@ -50,6 +52,24 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 		'us-gov-west-1',
 		'us-gov-east-1',
 	);
+
+	/**
+	 * Sets environment variable "MAGIC".
+	 * Since test_upload_file() calls function to crate FInfo instance.
+	 */
+	public function setUp() {
+		parent::setUp();
+		putenv( 'MAGIC=' . Magic_For_Test::get() );
+	}
+
+	/**
+	 * Unsets environment variable "MAGIC".
+	 */
+	public function tearDown() {
+		putenv( 'MAGIC' );
+		parent::tearDown();
+	}
+
 	/**
 	 * Test steps for init_s3().
 	 * 
