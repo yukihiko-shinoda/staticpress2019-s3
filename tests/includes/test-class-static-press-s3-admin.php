@@ -40,6 +40,7 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 				'access_key' => 'accessKey',
 				'secret_key' => 'secretKey',
 				'region'     => 'region',
+				'endpoint'   => 'endpoint',
 				'bucket'     => 'bucket',
 			)
 		);
