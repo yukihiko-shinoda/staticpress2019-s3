@@ -224,6 +224,6 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 	 *                           User error handler must not modify error context.
 	 */
 	public function handleError( $errno, $errstr, $errfile, $errline, $errcontext ) {
-		$this->errors[] = compact( 'errno', 'errstr', 'errfile', '"errline', 'errcontext' );
+		$this->errors[] = compact( 'errno', 'errstr', 'errfile', 'errline', 'errcontext' );
 	}
 }
