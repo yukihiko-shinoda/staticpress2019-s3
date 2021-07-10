@@ -5,6 +5,12 @@
  * @package static_press\tests\includes
  */
 
+/**
+ * Require once.
+ * (This comment prevents to PHP_CodeSniffer detect "Missing file doc comment".)
+ * 
+ * @see https://qiita.com/juthaDDA/items/fa2590c1032abbf87334
+ */
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-finfo-factory.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-magic-for-test.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';

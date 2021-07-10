@@ -4,6 +4,13 @@
  *
  * @package static_press_s3\includes
  */
+
+/**
+ * Require once.
+ * (This comment prevents to PHP_CodeSniffer detect "Missing file doc comment".)
+ * 
+ * @see https://qiita.com/juthaDDA/items/fa2590c1032abbf87334
+ */
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws-sdk-php-from-zip/aws-autoloader.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-finfo-factory.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-mime-type-checker.php';
