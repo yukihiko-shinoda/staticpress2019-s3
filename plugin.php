@@ -9,6 +9,7 @@
  * @author      Yoshihiro Ibayashi
  * @author      megane9988
  * @author      yuiwasaki
+ * @author      sakakinox
  * @copyright   2013 wokamoto
  * @license     GPL-2.0-or-later
  * 
