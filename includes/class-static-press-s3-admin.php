@@ -149,8 +149,8 @@ class Static_Press_S3_Admin {
 		$s3      = new Static_Press_S3_Helper(
 			! empty( $this->options['access_key'] ) ? $this->options['access_key'] : null,
 			! empty( $this->options['secret_key'] ) ? $this->options['secret_key'] : null,
-			! empty( $this->options['endpoint'] ) ? $this->options['endpoint'] : null,
-			! empty( $this->options['region'] ) ? $this->options['region'] : null
+			! empty( $this->options['region'] ) ? $this->options['region'] : null,
+			! empty( $this->options['endpoint'] ) ? $this->options['endpoint'] : null
 		);
 		$regions = $this->regions;
 		$buckets = false;

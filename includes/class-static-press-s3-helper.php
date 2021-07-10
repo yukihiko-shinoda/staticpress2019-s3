@@ -81,10 +81,10 @@ class Static_Press_S3_Helper {
 	 * 
 	 * @param string $access_key Access key.
 	 * @param string $secret_key Secret key.
-	 * @param string $endpoint   S3 compati endpointURL.
 	 * @param string $region     Region.
+	 * @param string $endpoint   S3 compati endpointURL.
 	 */
-	public function __construct( $access_key = null, $secret_key = null, $endpoint, $region = null ) {
+	public function __construct( $access_key = null, $secret_key = null, $region = null, $endpoint = null ) {
 		$this->init_s3( $access_key, $secret_key, $endpoint, $region );
 	}
 
@@ -93,11 +93,11 @@ class Static_Press_S3_Helper {
 	 * 
 	 * @param string $access_key Access key.
 	 * @param string $secret_key Secret key.
-	 * @param string $endpoint   S3 compati endpointURL.
 	 * @param string $region     Region.
+	 * @param string $endpoint   S3 compati endpointURL.
 	 * @return S3Client S3 client.
 	 */
-	public function init_s3( $access_key, $secret_key, $endpoint, $region = null ) {
+	public function init_s3( $access_key, $secret_key, $region = null, $endpoint = null ) {
 		if ( ! isset( $region ) ) {
 			$region = 'ap-northeast-1';
 		}

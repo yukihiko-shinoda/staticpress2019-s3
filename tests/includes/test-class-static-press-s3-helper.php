@@ -57,6 +57,7 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 		'sa-east-1',
 		'us-gov-west-1',
 		'us-gov-east-1',
+		'other',
 	);
 
 	/**

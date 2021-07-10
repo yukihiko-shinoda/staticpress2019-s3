@@ -34,8 +34,8 @@ class Static_Press_S3 {
 			$s3 = new Static_Press_S3_Helper(
 				isset($this->options['access_key']) ? $this->options['access_key'] : null,
 				isset($this->options['secret_key']) ? $this->options['secret_key'] : null,
-				isset($this->options['endpoint'])   ? $this->options['endpoint']   : null,
-				isset($this->options['region'])     ? $this->options['region']     : null
+				isset($this->options['region'])     ? $this->options['region']     : null,
+				isset($this->options['endpoint'])   ? $this->options['endpoint']   : null
 				);
 			if ($s3 && isset($S3_bucket))
 				$s3->set_current_bucket($S3_bucket);
