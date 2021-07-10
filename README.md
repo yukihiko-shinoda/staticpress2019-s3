@@ -1,10 +1,10 @@
 # 🗽StaticPress2019-S3🗿
 
-[![Build Status](https://travis-ci.org/yukihiko-shinoda/staticpress-s3.svg?branch=master)](https://travis-ci.org/yukihiko-shinoda/staticpress-s3)
+[![Build Status](https://travis-ci.com/yukihiko-shinoda/staticpress2019-s3.svg?branch=master)](https://travis-ci.com/yukihiko-shinoda/staticpress2019-s3)
 [![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/staticpress2019-s3)](https://wordpress.org/plugins/staticpress2019-s3/)
-[![WordPress Plugin: Tested WP Version](https://img.shields.io/wordpress/plugin/tested/staticpress2019-s3)](https://travis-ci.org/yukihiko-shinoda/staticpress-s3)
-[![PHP from Travis config](https://img.shields.io/travis/php-v/yukihiko-shinoda/staticpress-s3/master)](https://travis-ci.org/yukihiko-shinoda/staticpress-s3)
-[![WordPress Plugin: Required WP Version](https://img.shields.io/wordpress/plugin/wp-version/staticpress2019-s3)](https://travis-ci.org/yukihiko-shinoda/staticpress-s3)
+[![WordPress Plugin: Tested WP Version](https://img.shields.io/wordpress/plugin/tested/staticpress2019-s3)](https://travis-ci.com/yukihiko-shinoda/staticpress2019-s3)
+[![PHP from Travis config](https://img.shields.io/travis/php-v/yukihiko-shinoda/staticpress2019-s3/master)](https://travis-ci.com/yukihiko-shinoda/staticpress2019-s3)
+[![WordPress Plugin: Required WP Version](https://img.shields.io/wordpress/plugin/wp-version/staticpress2019-s3)](https://travis-ci.com/yukihiko-shinoda/staticpress2019-s3)
 [![WordPress Plugin Active Installs](https://img.shields.io/wordpress/plugin/installs/staticpress2019-s3)](https://wordpress.org/plugins/staticpress2019-s3/advanced/)
 [![WordPress Plugin Downloads](https://img.shields.io/wordpress/plugin/dm/staticpress2019-s3)](https://wordpress.org/plugins/staticpress2019-s3/advanced/)
 
