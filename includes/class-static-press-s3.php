@@ -23,20 +23,24 @@ class Static_Press_S3 {
 		$result    = $this->s3_upload($file_dest, $s3_bucket, $s3_key);
 	}
 
-	// Initializing S3 object
-	private function s3($S3_bucket = null){
+	/** 
+	 * Initializing S3 object.
+	 * 
+	 * @param string $S3_bucket S3 bucket.
+	 */
+	private function s3( $S3_bucket = null ) {
 		if (isset($this->s3)) {
 			if (isset($S3_bucket) && $this->s3->current_bucket() !== $S3_bucket)
 				$this->s3->set_current_bucket($S3_bucket);
 			return $this->s3;
 		}
-		if ($this->options) {
+		if ( $this->options ) {
 			$s3 = new Static_Press_S3_Helper(
 				isset($this->options['access_key']) ? $this->options['access_key'] : null,
 				isset($this->options['secret_key']) ? $this->options['secret_key'] : null,
 				isset($this->options['region'])     ? $this->options['region']     : null,
-				isset($this->options['endpoint'])   ? $this->options['endpoint']   : null
-				);
+				isset( $this->options['endpoint'] ) ? $this->options['endpoint'] : null
+			);
 			if ($s3 && isset($S3_bucket))
 				$s3->set_current_bucket($S3_bucket);
 			$this->s3 = $s3;

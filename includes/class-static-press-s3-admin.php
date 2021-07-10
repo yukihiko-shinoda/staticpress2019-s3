@@ -158,8 +158,8 @@ class Static_Press_S3_Admin {
 			$regions = $s3->get_regions();
 			$buckets = $s3->list_buckets();
 		}
-		if ( $this->options['region'] != 'other'){
-			unset($option_keys['endpoint']);
+		if ( 'other' != $this->options['region'] ) {
+			unset( $option_keys['endpoint'] );
 		}
 		if ( ! $buckets ) {
 			unset( $option_keys['bucket'] );

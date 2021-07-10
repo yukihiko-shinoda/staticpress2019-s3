@@ -56,7 +56,7 @@ class Static_Press_S3_Helper {
 		'sa-east-1',
 		'us-gov-west-1',
 		'us-gov-east-1',
-		'other'
+		'other',
 	);
 	const REGION_NORTH_VIRGINIA = 'us-east-1';
 	/**
@@ -102,16 +102,14 @@ class Static_Press_S3_Helper {
 			$region = 'ap-northeast-1';
 		}
 
-		if ( $region == 'other'){
+		if ( 'other' == $region ) {
 			$args = array(
-				'region' => 'other',
-				'endpoint' => $endpoint,
-				'version'  => 'latest',
+				'region'                  => 'other',
+				'endpoint'                => $endpoint,
+				'version'                 => 'latest',
 				'use_path_style_endpoint' => true,
 			);
-
-		}
-		else {
+		} else {
 			$args = array(
 				'region'  => $this->get_region( $region ),
 				'version' => 'latest',
