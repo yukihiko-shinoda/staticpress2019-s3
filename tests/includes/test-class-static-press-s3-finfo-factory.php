@@ -14,15 +14,17 @@
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-finfo-factory.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-magic-for-test.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-polyfill-wp-unittestcase.php';
 use static_press_s3\includes\Static_Press_S3_Finfo_Factory;
 use static_press_s3\tests\testlibraries\Magic_For_Test;
 use static_press_s3\tests\testlibraries\Path_Creator;
+use static_press_s3\tests\testlibraries\Polyfill_WP_UnitTestCase;
 /**
  * Static_Press_S3_Helper test case.
  *
  * @noinspection PhpUndefinedClassInspection
  */
-class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
+class Static_Press_S3_Finfo_Factory_Test extends Polyfill_WP_UnitTestCase {
 	/**
 	 * Errors.
 	 * 
@@ -39,8 +41,8 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 	/**
 	 * Unsets environment variable "MAGIC".
 	 */
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 		$this->errors = array();
 		set_error_handler( array( $this, 'handleError' ) );
 		$this->temporary_magic_file = Path_Creator::create_file_path( 'magic' );
@@ -53,13 +55,13 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 	/**
 	 * Remove temoporary magic file.
 	 */
-	public function tearDown() {
+	public function tear_down() {
 		Mockery::close();
 		if ( file_exists( $this->temporary_magic_file ) ) {
 			$this->rm( $this->temporary_magic_file );
 		}
 		restore_error_handler();
-		parent::tearDown();
+		parent::tear_down();
 	}
 
 	/**
@@ -138,7 +140,12 @@ class Static_Press_S3_Finfo_Factory_Test extends \WP_UnitTestCase {
 		$magic_file = '*/:<>?\|';
 		if ( version_compare( PHP_VERSION, '7.0', '>=' ) ) {
 			$this->expectException( Exception::class );
-			$this->expectExceptionMessageRegExp( '/magic\)\: failed to open stream\: No such file or directory/' );
+			global $wp_version;
+			if ( version_compare( $wp_version, '5.9.0', '<' ) ) {
+				$this->expectExceptionMessageRegExp( '/magic\)\: [fF]ailed to open stream\: No such file or directory/' );
+			} else {
+				$this->expectExceptionMessageMatches( '/magic\)\: [fF]ailed to open stream\: No such file or directory/' );
+			}
 		}
 		$finfo_factory = new Static_Press_S3_Finfo_Factory();
 		$finfo_factory->create( $magic_file );

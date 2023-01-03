@@ -6,11 +6,19 @@
  */
 
 /**
+ * Require once.
+ * (This comment prevents to PHP_CodeSniffer detect "Missing file doc comment".)
+ * 
+ * @see https://qiita.com/juthaDDA/items/fa2590c1032abbf87334
+ */
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-polyfill-wp-unittestcase.php';
+use static_press_s3\tests\testlibraries\Polyfill_WP_UnitTestCase;
+/**
  * Plugin test case.
  *
  * @noinspection PhpUndefinedClassInspection
  */
-class Plugin_Test extends \WP_UnitTestCase {
+class Plugin_Test extends Polyfill_WP_UnitTestCase {
 	/**
 	 * Path to plugin.php file.
 	 * 
@@ -20,8 +28,8 @@ class Plugin_Test extends \WP_UnitTestCase {
 	/**
 	 * Sets path to plugin file and require.
 	 */
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 		$this->path_to_plugin_file = dirname( dirname( __FILE__ ) ) . '/plugin.php';
 		require $this->path_to_plugin_file;
 		remove_action( 'plugins_loaded', 'static_press_s3_run' );
