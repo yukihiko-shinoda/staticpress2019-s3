@@ -15,14 +15,16 @@ require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws-sdk-php-from-zip/aws-aut
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-magic-for-test.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-polyfill-wp-unittestcase.php';
 use static_press_s3\tests\testlibraries\Magic_For_Test;
 use static_press_s3\tests\testlibraries\Path_Creator;
+use static_press_s3\tests\testlibraries\Polyfill_WP_UnitTestCase;
 /**
  * Static_Press_S3_Helper test case.
  *
  * @noinspection PhpUndefinedClassInspection
  */
-class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
+class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 	const REGION_NORTH_VIRGINIA = 'us-east-1';
 	const REGION_TOKYO          = 'ap-northeast-1';
 	const REGION_OREGON         = 'us-west-2';
@@ -64,17 +66,17 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 	 * Sets environment variable "MAGIC".
 	 * Since test_upload_file() calls function to crate FInfo instance.
 	 */
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 		putenv( 'MAGIC=' . Magic_For_Test::get() );
 	}
 
 	/**
 	 * Unsets environment variable "MAGIC".
 	 */
-	public function tearDown() {
+	public function tear_down() {
 		putenv( 'MAGIC' );
-		parent::tearDown();
+		parent::tear_down();
 	}
 
 	/**
@@ -201,6 +203,13 @@ class Static_Press_S3_Helper_Test extends \WP_UnitTestCase {
 		$this->assertEquals( $expected_response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
 	}
 
+	/**
+	 * Function test_upload() should return false when S3 client not exist.
+	 */
+	public function test_list_buckets() {
+		$s3_helper = new Static_Press_S3_Helper();
+		$this->assertEquals( false, $s3_helper->list_buckets() );
+	}
 	/**
 	 * Creates S# client pertial mock.
 	 * 
