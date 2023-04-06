@@ -85,7 +85,7 @@ class Static_Press_S3_Helper {
 	 * @param string $endpoint   S3 compati endpointURL.
 	 */
 	public function __construct( $access_key = null, $secret_key = null, $region = null, $endpoint = null ) {
-		$this->init_s3( $access_key, $secret_key, $endpoint, $region );
+		$this->init_s3( $access_key, $secret_key, $region, $endpoint );
 	}
 
 	/**
