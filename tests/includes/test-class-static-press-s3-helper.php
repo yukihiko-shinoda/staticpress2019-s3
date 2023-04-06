@@ -88,9 +88,40 @@ class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 	 * @param string $region Region.
 	 * @param string $expected Expected.
 	 */
+	public function test_construct( $access_key, $secret_key, $region, $expected ) {
+		$s3_helper          = new Static_Press_S3_Helper( $access_key, $secret_key, $region );
+		$reflection         = new \ReflectionClass( get_class( $s3_helper ) );
+		$reflector_property = $reflection->getProperty( 's3' );
+		$reflector_property->setAccessible( true );
+		$s3_client = $reflector_property->getValue( $s3_helper );
+		$this->assert_s3_client( $s3_client, $access_key, $secret_key, $expected );
+	}
+
+	/**
+	 * Test steps for init_s3().
+	 * 
+	 * @dataProvider provider_init_s3
+	 * @param string $access_key Access key.
+	 * @param string $secret_key Secret key.
+	 * @param string $region Region.
+	 * @param string $expected Expected.
+	 */
 	public function test_init_s3( $access_key, $secret_key, $region, $expected ) {
-		$s3_helper   = new Static_Press_S3_Helper();
-		$s3_client   = $s3_helper->init_s3( $access_key, $secret_key, $region );
+		$s3_helper = new Static_Press_S3_Helper();
+		$s3_client = $s3_helper->init_s3( $access_key, $secret_key, $region );
+		$this->assert_s3_client( $s3_client, $access_key, $secret_key, $expected );
+	}
+
+	/**
+	 * Test S3 client.
+	 * 
+	 * @dataProvider provider_init_s3
+	 * @param S3Client $s3_client S3 client.
+	 * @param string   $access_key Access key.
+	 * @param string   $secret_key Secret key.
+	 * @param string   $expected Expected.
+	 */
+	private function assert_s3_client( $s3_client, $access_key, $secret_key, $expected ) {
 		$credentials = $s3_client->getCredentials()->wait();
 		$config      = $s3_client->getConfig();
 		$this->assertEquals( $access_key, $credentials->getAccessKeyId() );
