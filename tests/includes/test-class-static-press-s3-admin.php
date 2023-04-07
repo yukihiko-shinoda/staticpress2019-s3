@@ -11,9 +11,9 @@
  * 
  * @see https://qiita.com/juthaDDA/items/fa2590c1032abbf87334
  */
-require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-admin.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
+use static_press_s3\includes\Static_Press_S3_Admin;
 use static_press_s3\tests\testlibraries\Path_Creator;
 /**
  * Static_Press_S3_Admin test case.
@@ -28,6 +28,23 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 		$this->expectOutputRegex( $this->create_regex( '', '' ) );
 		$admin = new Static_Press_S3_Admin();
 		$admin->options_page();
+	}
+
+	/**
+	 * Test steps for init_s3().
+	 */
+	public function test_option_keys() {
+		$admin = new Static_Press_S3_Admin();
+		$this->assertEquals(
+			$admin->option_keys(),
+			array(
+				'access_key' => 'AWS Access Key',
+				'secret_key' => 'AWS Secret Key',
+				'region'     => 'AWS Region',
+				'endpoint'   => 'S3 Endpoint',
+				'bucket'     => 'S3 Bucket',
+			)
+		);
 	}
 
 	/**

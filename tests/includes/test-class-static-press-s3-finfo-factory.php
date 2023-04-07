@@ -53,7 +53,7 @@ class Static_Press_S3_Finfo_Factory_Test extends Polyfill_WP_UnitTestCase {
 	}
 
 	/**
-	 * Remove temoporary magic file.
+	 * Remove temporary magic file.
 	 */
 	public function tear_down() {
 		Mockery::close();
@@ -219,7 +219,7 @@ class Static_Press_S3_Finfo_Factory_Test extends Polyfill_WP_UnitTestCase {
 	}
 
 	/**
-	 * Copies recursivery.
+	 * Copies recursively.
 	 * 
 	 * @param string $src Source.
 	 * @param string $dst Destination.

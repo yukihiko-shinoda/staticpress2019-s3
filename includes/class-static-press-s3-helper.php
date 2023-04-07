@@ -5,6 +5,8 @@
  * @package static_press_s3\includes
  */
 
+namespace static_press_s3\includes;
+
 /**
  * Require once.
  * (This comment prevents to PHP_CodeSniffer detect "Missing file doc comment".)
@@ -13,8 +15,10 @@
  */
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws-sdk-php-from-zip/aws-autoloader.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-finfo-factory.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-log.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-mime-type-checker.php';
 use static_press_s3\includes\Static_Press_S3_Finfo_Factory;
+use static_press_s3\includes\Static_Press_S3_Log;
 use static_press_s3\includes\Static_Press_S3_Mime_Type_Checker;
 
 use Aws\S3\S3Client;
@@ -73,6 +77,11 @@ class Static_Press_S3_Helper {
 	private $options = array(
 		'Bucket'       => '',
 		'StorageClass' => 'STANDARD',
+		/**
+		 * Required to set public-read:
+		 * - Setting permissions for website access - Amazon Simple Storage Service
+		 *   https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html#object-acl
+		 */
 		'ACL'          => 'public-read',
 	);
 
@@ -82,7 +91,7 @@ class Static_Press_S3_Helper {
 	 * @param string $access_key Access key.
 	 * @param string $secret_key Secret key.
 	 * @param string $region     Region.
-	 * @param string $endpoint   S3 compati endpointURL.
+	 * @param string $endpoint   S3 compatible endpointURL.
 	 */
 	public function __construct( $access_key = null, $secret_key = null, $region = null, $endpoint = null ) {
 		$this->init_s3( $access_key, $secret_key, $region, $endpoint );
@@ -94,7 +103,7 @@ class Static_Press_S3_Helper {
 	 * @param string $access_key Access key.
 	 * @param string $secret_key Secret key.
 	 * @param string $region     Region.
-	 * @param string $endpoint   S3 compati endpointURL.
+	 * @param string $endpoint   S3 compatible endpointURL.
 	 * @return S3Client S3 client.
 	 */
 	public function init_s3( $access_key, $secret_key, $region = null, $endpoint = null ) {
@@ -121,7 +130,7 @@ class Static_Press_S3_Helper {
 				'secret' => $secret_key,
 			);
 		}
-		$s3 = new Aws\S3\S3Client( $args );
+		$s3       = new S3Client( $args );
 		$this->s3 = $s3;
 		return $s3;
 	}
@@ -143,17 +152,6 @@ class Static_Press_S3_Helper {
 	 */
 	public function get_region( $region ) {
 		return in_array( $region, self::REGIONS, true ) ? $region : self::REGION_NORTH_VIRGINIA;
-	}
-
-	/**
-	 * Sets option.
-	 * 
-	 * @param array $option_array Option array.
-	 */
-	public function set_option($option_array){
-		if (!is_array($option_array))
-			return false;
-		$this->options = array_merge($this->options, $option_array);
 	}
 
 	/**
@@ -188,6 +186,7 @@ class Static_Press_S3_Helper {
 			$response = $this->s3->putObject( $args );
 			return $response;
 		} catch ( S3Exception $e ) {
+			Static_Press_S3_Log::log( $e );
 			return false;
 		}
 	}
@@ -218,6 +217,7 @@ class Static_Press_S3_Helper {
 			file_put_contents($download_path, $response['Body']->read($response['ContentLength']));
 			return $response;
 		} catch (S3Exception $e) {
+			Static_Press_S3_Log::log( $e );
 			return false;
 		}
 	}
@@ -243,6 +243,7 @@ class Static_Press_S3_Helper {
 			$response = $this->s3->deleteObject($args);
 			return $response;
 		} catch (S3Exception $e) {
+			Static_Press_S3_Log::log( $e );
 			return false;
 		}
 	}
@@ -260,8 +261,10 @@ class Static_Press_S3_Helper {
 			$list_buckets = $this->s3->listBuckets();
 			return isset( $list_buckets['Buckets'] ) ? $list_buckets['Buckets'] : false;
 		} catch ( S3Exception $e ) {
+			Static_Press_S3_Log::log( $e );
 			return false;
 		} catch ( CredentialsException $e ) {
+			Static_Press_S3_Log::log( $e );
 			return false;
 		}
 	}
@@ -271,8 +274,8 @@ class Static_Press_S3_Helper {
 	 * 
 	 * @return string|false Current bucket when bucket is set, otherwise false.
 	 */
-	public function current_bucket(){
-		return isset($this->options['Bucket']) ? $this->options['Bucket'] : false;
+	public function current_bucket() {
+		return isset( $this->options['Bucket'] ) ? $this->options['Bucket'] : false;
 	}
 
 	/**
@@ -281,14 +284,13 @@ class Static_Press_S3_Helper {
 	 * @param string $bucket Bucket.
 	 * @return string|false Bucket when succeed, otherwise false.
 	 */
-	public function set_current_bucket($bucket){
-		if ($this->bucket_exists($bucket)) {
-			$this->options['Bucket'] = $bucket;
-			return $bucket;
-		} else {
+	public function set_current_bucket( $bucket ) {
+		if ( ! $this->bucket_exists( $bucket ) ) {
 			return false;
 		}
-	}
+		$this->options['Bucket'] = $bucket;
+		return $bucket;
+}
 
 	/**
 	 * Does bucket exists.
@@ -297,12 +299,14 @@ class Static_Press_S3_Helper {
 	 * @param bool   $accept403 Whether accept 403 error or not.
 	 * @return bool Whether bucket exist or not.
 	 */
-	public function bucket_exists($bucket = null, $accept403 = true) {
-		if (!isset($this->s3))
+	public function bucket_exists( $bucket = null, $accept403 = true ) {
+		if ( ! isset( $this->s3 ) ) {
 			return false;
-		if (!isset($bucket))
-			$bucket = isset($this->options['Bucket']) ? $this->options['Bucket'] : false;
-		return $bucket ? $this->s3->doesBucketExist($bucket, $accept403) : false;
+		}
+		if ( ! isset( $bucket ) ) {
+			$bucket = isset( $this->options['Bucket'] ) ? $this->options['Bucket'] : false;
+		}
+		return $bucket ? $this->s3->doesBucketExist( $bucket, $accept403 ) : false;
 	}
 
 	/**

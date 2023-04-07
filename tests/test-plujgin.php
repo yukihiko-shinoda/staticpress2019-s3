@@ -49,8 +49,8 @@ class Plugin_Test extends Polyfill_WP_UnitTestCase {
 		require $this->path_to_plugin_file;
 		$this->assertEquals( 10, has_action( 'plugins_loaded', 'static_press_s3_run' ) );
 		do_action( 'plugins_loaded' );
-		$this->assertTrue( class_exists( 'Static_Press_S3_Helper' ) );
-		$this->assertTrue( class_exists( 'Static_Press_S3_Admin' ) );
-		$this->assertTrue( class_exists( 'Static_Press_S3' ) );
+		$this->assertTrue( class_exists( 'static_press_s3\includes\Static_Press_S3_Helper' ) );
+		$this->assertTrue( class_exists( 'static_press_s3\includes\Static_Press_S3_Admin' ) );
+		$this->assertTrue( class_exists( 'static_press_s3\includes\Static_Press_S3' ) );
 	}
 }
