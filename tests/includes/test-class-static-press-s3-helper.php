@@ -13,9 +13,12 @@
  */
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws-sdk-php-from-zip/aws-autoloader.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-mock-creator.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-magic-for-test.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-polyfill-wp-unittestcase.php';
+use static_press_s3\includes\Static_Press_S3_Helper;
+use static_press_s3\tests\testlibraries\Mock_Creator;
 use static_press_s3\tests\testlibraries\Magic_For_Test;
 use static_press_s3\tests\testlibraries\Path_Creator;
 use static_press_s3\tests\testlibraries\Polyfill_WP_UnitTestCase;
@@ -193,18 +196,8 @@ class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 		$bucket            = '';
 		$response          = 'response';
 		$file_path         = Path_Creator::create_file_path( $filename );
-		$expected_argument = Mockery::on(
-			function ( $argument ) use ( $bucket, $file_path ) {
-				$bucket_is_set        = isset( $argument['Bucket'] ) && $bucket === $argument['Bucket'];
-				$storage_class_is_set = isset( $argument['StorageClass'] ) && 'STANDARD' === $argument['StorageClass'];
-				$acl_is_set           = isset( $argument['ACL'] ) && 'public-read' === $argument['ACL'];
-				$key_is_set           = isset( $argument['Key'] ) && $file_path === $argument['Key'];
-				$body_is_set          = isset( $argument['Body'] );
-				$content_type_is_set  = isset( $argument['ContentType'] ) && 'text/plain' === $argument['ContentType'];
-				return $bucket_is_set && $storage_class_is_set && $acl_is_set && $key_is_set && $body_is_set && $content_type_is_set;
-			}
-		);
-		$s3_helper         = $this->create_s3_helper_partial_mock( $this->create_s3_client_partial_mock( $expected_argument, $response ) );
+		$expected_argument = Mock_Creator::create_expected_argument( $bucket, $file_path );
+		$s3_helper         = Mock_Creator::create_s3_helper_partial_mock( Mock_Creator::create_s3_client_partial_mock_put_object( $expected_argument, $response ) );
 		$this->assertEquals( $response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
 	}
 
@@ -218,19 +211,19 @@ class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 		$response          = 'response';
 		$expected_argument = array();
 		$expected_response = false;
-		$s3_helper         = $this->create_s3_helper_partial_mock( $this->create_s3_client_partial_mock( $expected_argument, $response ) );
+		$s3_helper         = Mock_Creator::create_s3_helper_partial_mock( Mock_Creator::create_s3_client_partial_mock_put_object( $expected_argument, $response ) );
 		$this->assertEquals( $expected_response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
 	}
 
 	/**
 	 * Function test_upload() should return false when S3 client not exist.
 	 */
-	public function test_upload_s3_cilent_not_exist() {
+	public function test_upload_s3_client_not_exist() {
 		$filename          = 'file.txt';
 		$upload_path       = '';
 		$bucket            = '';
 		$expected_response = false;
-		$s3_helper         = $this->create_s3_helper_partial_mock( false );
+		$s3_helper         = Mock_Creator::create_s3_helper_partial_mock( false );
 		$this->assertEquals( $expected_response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
 	}
 
@@ -240,36 +233,6 @@ class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 	public function test_list_buckets() {
 		$s3_helper = new Static_Press_S3_Helper();
 		$this->assertEquals( false, $s3_helper->list_buckets() );
-	}
-	/**
-	 * Creates S# client pertial mock.
-	 * 
-	 * @param mixed  $expected Expected.
-	 * @param string $response Response.
-	 * @return S3Client S3 helper partial mock.
-	 */
-	private function create_s3_client_partial_mock( $expected, $response ) {
-		$s3_helper      = new Static_Press_S3_Helper();
-		$mock_s3_client = Mockery::mock( $s3_helper->init_s3( '', '' ) );
-		$mock_s3_client->shouldReceive( 'putObject' )
-		->with( $expected )
-		->andReturn( $response );
-		return $mock_s3_client;
-	}
-
-	/**
-	 * Creates S3 helper partial mock which S3 client replaced.
-	 * 
-	 * @param string $s3_client S3 client.
-	 * @return Static_Press_S3_Helper S3 helper partial mock.
-	 */
-	private function create_s3_helper_partial_mock( $s3_client ) {
-		$s3_helper           = new Static_Press_S3_Helper();
-		$reflection          = new ReflectionClass( $s3_helper );
-		$reflection_property = $reflection->getProperty( 's3' );
-		$reflection_property->setAccessible( true );
-		$reflection_property->setValue( $s3_helper, $s3_client );
-		return $s3_helper;
 	}
 
 	/**

@@ -1,67 +1,92 @@
 <?php
+/**
+ * Class Static_Press_S3
+ *
+ * @package static_press_s3\includes
+ */
+
+namespace static_press_s3\includes;
+
+/**
+ * StaticPress S3.
+ */
 class Static_Press_S3 {
 	static $debug_mode  = false;
-    static $instance;
+	static $instance;
 
-	private $s3;                // S3 Object
-	private $options = array(); // this plugin options
+	/**
+	 * S3 Helper.
+	 * 
+	 * @var Static_Press_S3_Helper
+	 */
+	private $s3;
+	/**
+	 * This plugin options.
+	 * 
+	 * @var string[]
+	 */
+	private $options = array();
 
-	function __construct($options){
-        self::$instance = $this;
-
-		$this->options = $options;
-		add_action('StaticPress::file_put', array($this, 'file_put'), 10, 2);
+	/**
+	 * Inits.
+	 * 
+	 * @param string[] $options Options set in Admin page.
+	 */
+	public function __construct( $options ) {
+		self::$instance = $this;
+		$this->options  = $options;
+		add_action( 'StaticPress::file_put', array( $this, 's3_upload' ), 10, 2 );
 	}
 
-	static public function plugin_basename() {
-		return plugin_basename(dirname(dirname(__FILE__)).'/plugin.php');
+	/**
+	 * Returns plugin base name.
+	 * 
+	 * @return string
+	 */
+	public static function plugin_basename() {
+		return plugin_basename( dirname( dirname( __FILE__ ) ) . '/plugin.php' );
 	}
 
-	public function file_put($file_dest, $url){
-		$s3_bucket = isset($this->options['bucket']) ? $this->options['bucket'] : false;
-		$s3_key    = preg_replace('#^(https?://[^/]+/|/)#i', '', urldecode($url));
-		$result    = $this->s3_upload($file_dest, $s3_bucket, $s3_key);
+	/** 
+	 * Uploads file to S3.
+	 * 
+	 * @param string $file_name File name.
+	 * @param string $url S3 key.
+	 */
+	public function s3_upload( $file_name, $url ) {
+		$this->s3 = $this->s3();
+		if ( ! $this->s3 ) {
+			return false;
+		}
+		$s3_bucket = isset( $this->options['bucket'] ) ? $this->options['bucket'] : false;
+		if ( isset( $s3_bucket ) && $this->s3->current_bucket() !== $s3_bucket ) {
+			$this->s3->set_current_bucket( $s3_bucket );
+		}
+		$s3_key = preg_replace( '#^(https?://[^/]+/|/)#i', '', urldecode( $url ) );
+		if ( ! file_exists( $file_name ) ) {
+			return false;
+		}
+		return $this->s3->upload( $file_name, $s3_key );
 	}
 
 	/** 
 	 * Initializing S3 object.
 	 * 
-	 * @param string $S3_bucket S3 bucket.
+	 * @return Static_Press_S3_Helper|false
 	 */
-	private function s3( $S3_bucket = null ) {
-		if (isset($this->s3)) {
-			if (isset($S3_bucket) && $this->s3->current_bucket() !== $S3_bucket)
-				$this->s3->set_current_bucket($S3_bucket);
+	private function s3() {
+		if ( isset( $this->s3 ) ) {
 			return $this->s3;
 		}
-		if ( $this->options ) {
-			$s3 = new Static_Press_S3_Helper(
-				isset($this->options['access_key']) ? $this->options['access_key'] : null,
-				isset($this->options['secret_key']) ? $this->options['secret_key'] : null,
-				isset($this->options['region'])     ? $this->options['region']     : null,
-				isset( $this->options['endpoint'] ) ? $this->options['endpoint'] : null
-			);
-			if ($s3 && isset($S3_bucket))
-				$s3->set_current_bucket($S3_bucket);
-			$this->s3 = $s3;
-			return $s3;
-		}
-		return false;
-	}
-
-	// Upload file to S3
-	private function s3_upload($filename, $S3_bucket, $S3_key){
-		if (!file_exists($filename))
+		if ( ! $this->options ) {
 			return false;
-
-		$upload_result = false;
-		if ($s3 = $this->s3($S3_bucket)) {
-			$upload_result = $s3->upload($filename, $S3_key);
-			if (self::$debug_mode && function_exists('dbgx_trace_var')) {
-				dbgx_trace_var($upload_result);
-			}
 		}
-		return $upload_result;
+		return new Static_Press_S3_Helper(
+			isset( $this->options['access_key'] ) ? $this->options['access_key'] : null,
+			isset( $this->options['secret_key'] ) ? $this->options['secret_key'] : null,
+			isset( $this->options['region'] ) ? $this->options['region'] : null,
+			isset( $this->options['endpoint'] ) ? $this->options['endpoint'] : null
+		);
 	}
 
 	// Download file to S3

@@ -52,6 +52,10 @@ if ( ! defined( 'STATIC_PRESS_S3_PLUGIN_DIR' ) ) {
 	 */
 	define( 'STATIC_PRESS_S3_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 }
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-admin.php';
+use static_press_s3\includes\Static_Press_S3;
+use static_press_s3\includes\Static_Press_S3_Admin;
 
 // Since this file includes multiple times when unit test.
 if ( ! function_exists( 'static_press_s3_run' ) ) {

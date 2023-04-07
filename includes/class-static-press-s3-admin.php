@@ -5,6 +5,8 @@
  * @package static_press_s3\includes
  */
 
+namespace static_press_s3\includes;
+
 /**
  * StaticPress S3 Admin page.
  */
@@ -52,11 +54,11 @@ class Static_Press_S3_Admin {
 	 */
 	public static function option_keys() {
 		return array(
-			'access_key' => __( 'AWS Access Key',  self::TEXT_DOMAIN ),
-			'secret_key' => __( 'AWS Secret Key',  self::TEXT_DOMAIN ),
-			'region'     => __( 'AWS Region',  self::TEXT_DOMAIN ),
-			'endpoint'   => __( 'S3 Endpoint',  self::TEXT_DOMAIN ),
-			'bucket'     => __( 'S3 Bucket',  self::TEXT_DOMAIN ),
+			'access_key' => __( 'AWS Access Key', 'staticpress_s3' ),
+			'secret_key' => __( 'AWS Secret Key', 'staticpress_s3' ),
+			'region'     => __( 'AWS Region', 'staticpress_s3' ),
+			'endpoint'   => __( 'S3 Endpoint', 'staticpress_s3' ),
+			'bucket'     => __( 'S3 Bucket', 'staticpress_s3' ),
 		);
 	}
 
