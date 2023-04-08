@@ -184,7 +184,9 @@ class Static_Press_S3_Helper {
 			return $this->s3->putObject( $args );
 		} catch ( S3Exception $e ) {
 			Static_Press_S3_Log::log( $e );
-			throw $e;
+			// To allow fail, StaticPress2019 still seems to fail dump in some case...
+			// throw $e;
+			return false;
 		}
 	}
 
