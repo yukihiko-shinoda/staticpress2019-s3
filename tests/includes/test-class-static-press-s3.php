@@ -90,7 +90,8 @@ class Static_Press_S3_Test extends Polyfill_WP_UnitTestCase {
 	/**
 	 * Creates Static_Press_S3 instance from Static_Press_S3_Admin::$options.
 	 * 
-	 * @param string|null $bucket Bucket name.
+	 * @param string|null $bucket         Bucket name.
+	 * @param bool        $put_public_acl Bucket name.
 	 * @return Static_Press_S3
 	 */
 	private function create_static_press_s3( $bucket = null, $put_public_acl = false ) {

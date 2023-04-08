@@ -14,16 +14,13 @@ namespace static_press_s3\includes;
  * @see https://qiita.com/juthaDDA/items/fa2590c1032abbf87334
  */
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/aws-sdk-php-from-zip/aws-autoloader.php';
-require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-finfo-factory.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-infrastructure.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-log.php';
-require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-mime-type-checker.php';
-use static_press_s3\includes\Static_Press_S3_Finfo_Factory;
-use static_press_s3\includes\Static_Press_S3_Log;
-use static_press_s3\includes\Static_Press_S3_Mime_Type_Checker;
-
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 use Aws\Exception\CredentialsException;
+use static_press_s3\includes\Static_Press_S3_Infrastructure;
+use static_press_s3\includes\Static_Press_S3_Log;
 
 /**
  * S3 Helper.
@@ -169,7 +166,7 @@ class Static_Press_S3_Helper {
 				'Bucket'      => $bucket,
 				'Key'         => $upload_path,
 				'Body'        => $this->file_body( $filename ),
-				'ContentType' => $this->mime_type( $filename ),
+				'ContentType' => Static_Press_S3_Infrastructure::mime_type( $filename ),
 			)
 		);
 		/**
@@ -295,36 +292,4 @@ class Static_Press_S3_Helper {
 			: null;
 		return $filebody;
  	}
-
-	/**
-	 * Gets mime type.
-	 * 
-	 * @param string $filename Path to file.
-	 * @return string Mime type.
-	 */
-	private function mime_type( $filename ) {
-		static $info;
-		if ( ! isset( $info ) ) {
-			$finfo_factory = new Static_Press_S3_Finfo_Factory();
-			$info          = $finfo_factory->create( self::get_magic_file() );
-		}
-		$mime_type         = file_exists( $filename ) ? $info->file( $filename ) : false;
-		$mime_type_checker = new Static_Press_S3_Mime_Type_Checker( $filename, $mime_type );
-		return $mime_type_checker->get_mime_type();
-	}
-
-	/**
-	 * Gets magic file.
-	 * 
-	 * @return string|null Magic file.
-	 */
-	public static function get_magic_file() {
-		$array_candidate_magic_file = array( '/usr/share/misc/magic', '/usr/share/file/magic', '/etc/magic' );
-		foreach ( $array_candidate_magic_file as $candidate_magic_file ) {
-			if ( is_file( $candidate_magic_file ) ) {
-				return $candidate_magic_file;
-			}
-		}
-		return null;
-	}
 }

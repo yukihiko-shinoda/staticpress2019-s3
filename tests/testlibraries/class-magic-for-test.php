@@ -7,9 +7,9 @@
 
 namespace static_press_s3\tests\testlibraries;
 
-require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-infrastructure.php';
 
-use static_press_s3\includes\Static_Press_S3_Helper;
+use static_press_s3\includes\Static_Press_S3_Infrastructure;
 
 /**
  * Plugin switcher.
@@ -22,6 +22,6 @@ class Magic_For_Test {
 	 */
 	public static function get() {
 		$magic_for_test = getenv( 'MAGIC_FOR_TEST' );
-		return false === $magic_for_test ? Static_Press_S3_Helper::get_magic_file() : $magic_for_test;
+		return false === $magic_for_test ? Static_Press_S3_Infrastructure::get_magic_file() : $magic_for_test;
 	}
 }
