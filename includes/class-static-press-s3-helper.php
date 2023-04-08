@@ -306,7 +306,7 @@ class Static_Press_S3_Helper {
 		static $info;
 		if ( ! isset( $info ) ) {
 			$finfo_factory = new Static_Press_S3_Finfo_Factory();
-			$info          = $finfo_factory->create( $this->get_magic_file() );
+			$info          = $finfo_factory->create( self::get_magic_file() );
 		}
 		$mime_type         = file_exists( $filename ) ? $info->file( $filename ) : false;
 		$mime_type_checker = new Static_Press_S3_Mime_Type_Checker( $filename, $mime_type );
@@ -318,7 +318,7 @@ class Static_Press_S3_Helper {
 	 * 
 	 * @return string|null Magic file.
 	 */
-	private function get_magic_file() {
+	public static function get_magic_file() {
 		$array_candidate_magic_file = array( '/usr/share/misc/magic', '/usr/share/file/magic', '/etc/magic' );
 		foreach ( $array_candidate_magic_file as $candidate_magic_file ) {
 			if ( is_file( $candidate_magic_file ) ) {
