@@ -94,7 +94,7 @@ class Static_Press_S3_Helper {
 	 * @param string $endpoint   S3 compatible endpointURL.
 	 */
 	public function __construct( $access_key = null, $secret_key = null, $region = null, $endpoint = null ) {
-		$this->init_s3( $access_key, $secret_key, $region, $endpoint );
+		$this->s3 = $this->init_s3( $access_key, $secret_key, $region, $endpoint );
 	}
 
 	/**
@@ -130,9 +130,7 @@ class Static_Press_S3_Helper {
 				'secret' => $secret_key,
 			);
 		}
-		$s3       = new S3Client( $args );
-		$this->s3 = $s3;
-		return $s3;
+		return new S3Client( $args );
 	}
 
 	/**
@@ -157,34 +155,29 @@ class Static_Press_S3_Helper {
 	/**
 	 * Uploads.
 	 * 
-	 * @param string $filename    Filename.
-	 * @param string $upload_path Upload path.
-	 * @param string $bucket      Bucket.
+	 * @param string      $bucket      Bucket.
+	 * @param string      $filename    Filename.
+	 * @param string|null $upload_path Upload path.
+	 * @throws \InvalidArgumentException $filename has to exist.
 	 */
-	public function upload( $filename, $upload_path = null, $bucket = null ) {
-		if ( ! file_exists( $filename ) || ! $this->s3 ) {
-			return false;
+	public function upload( $bucket, $filename, $upload_path = null ) {
+		if ( ! file_exists( $filename ) ) {
+			throw new \InvalidArgumentException( '$filename has to exist. $filename = ' . $filename );
 		}
+		if ( ! $upload_path ) {
+			$upload_path = $filename;
+		}
+		$args = array_merge(
+			$this->options,
+			array(
+				'Bucket'      => $bucket,
+				'Key'         => $upload_path,
+				'Body'        => $this->file_body( $filename ),
+				'ContentType' => $this->mime_type( $filename ),
+			)
+		);
 		try {
-			if ( ! $upload_path ) {
-				$upload_path = $filename;
-			}
-			$args = array_merge(
-				$this->options,
-				array(
-					'Key'         => $upload_path,
-					'Body'        => $this->file_body( $filename ),
-					'ContentType' => $this->mime_type( $filename ),
-				)
-			);
-			if ( isset( $bucket ) ) {
-				$args['Bucket'] = $bucket;
-			}
-			if ( ! isset( $args['Bucket'] ) ) {
-				return false;
-			}
-			$response = $this->s3->putObject( $args );
-			return $response;
+			return $this->s3->putObject( $args );
 		} catch ( S3Exception $e ) {
 			Static_Press_S3_Log::log( $e );
 			return false;
@@ -199,9 +192,6 @@ class Static_Press_S3_Helper {
 	 * @param string $bucket        Bucket.
 	 */
 	public function download($key, $download_path = null, $bucket = null) {
-		if (!$this->s3)
-			return false;
-
 		try {
 			if (!$download_path)
 				$download_path = dirname(__FILE__).'/'.basename($key);
@@ -229,9 +219,6 @@ class Static_Press_S3_Helper {
 	 * @param string $bucket      Bucket.
 	 */
 	public function delete($upload_path, $bucket = null) {
-		if (!$this->s3)
-			return false;
-
 		try {
 			$args = array_merge($this->options, array(
 				'Key'         => $upload_path,
@@ -254,9 +241,6 @@ class Static_Press_S3_Helper {
 	 * @return array[]|false List of buckets when succeed, otherwise false.
 	 */
 	public function list_buckets() {
-		if ( ! isset( $this->s3 ) ) {
-			return false;
-		}
 		try {
 			$list_buckets = $this->s3->listBuckets();
 			return isset( $list_buckets['Buckets'] ) ? $list_buckets['Buckets'] : false;
@@ -270,43 +254,14 @@ class Static_Press_S3_Helper {
 	}
 
 	/**
-	 * Returns current bucket.
-	 * 
-	 * @return string|false Current bucket when bucket is set, otherwise false.
-	 */
-	public function current_bucket() {
-		return isset( $this->options['Bucket'] ) ? $this->options['Bucket'] : false;
-	}
-
-	/**
-	 * Sets current bucket.
-	 * 
-	 * @param string $bucket Bucket.
-	 * @return string|false Bucket when succeed, otherwise false.
-	 */
-	public function set_current_bucket( $bucket ) {
-		if ( ! $this->bucket_exists( $bucket ) ) {
-			return false;
-		}
-		$this->options['Bucket'] = $bucket;
-		return $bucket;
-}
-
-	/**
 	 * Does bucket exists.
 	 * 
 	 * @param string $bucket    Bucket.
 	 * @param bool   $accept403 Whether accept 403 error or not.
 	 * @return bool Whether bucket exist or not.
 	 */
-	public function bucket_exists( $bucket = null, $accept403 = true ) {
-		if ( ! isset( $this->s3 ) ) {
-			return false;
-		}
-		if ( ! isset( $bucket ) ) {
-			$bucket = isset( $this->options['Bucket'] ) ? $this->options['Bucket'] : false;
-		}
-		return $bucket ? $this->s3->doesBucketExist( $bucket, $accept403 ) : false;
+	public function bucket_exists( $bucket, $accept403 = true ) {
+		return $this->s3->doesBucketExist( $bucket, $accept403 );
 	}
 
 	/**
@@ -316,8 +271,6 @@ class Static_Press_S3_Helper {
 	 * @return bool Whether object exist or not.
 	 */
 	public function object_exists($key) {
-		if (!isset($this->s3))
-			return false;
 		if (!isset($this->options['Bucket']))
 			return false;
 		return $this->s3->doesObjectExist($this->options['Bucket'], $key);

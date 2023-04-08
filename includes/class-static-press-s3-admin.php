@@ -54,11 +54,11 @@ class Static_Press_S3_Admin {
 	 */
 	public static function option_keys() {
 		return array(
-			'access_key' => __( 'AWS Access Key', 'staticpress_s3' ),
-			'secret_key' => __( 'AWS Secret Key', 'staticpress_s3' ),
-			'region'     => __( 'AWS Region', 'staticpress_s3' ),
-			'endpoint'   => __( 'S3 Endpoint', 'staticpress_s3' ),
-			'bucket'     => __( 'S3 Bucket', 'staticpress_s3' ),
+			'access_key'   => __( 'AWS Access Key', 'staticpress_s3' ),
+			'secret_key'   => __( 'AWS Secret Key', 'staticpress_s3' ),
+			'region'       => __( 'AWS Region', 'staticpress_s3' ),
+			'endpoint'     => __( 'S3 Endpoint', 'staticpress_s3' ),
+			'bucket'       => __( 'S3 Bucket', 'staticpress_s3' ),
 		);
 	}
 
@@ -154,12 +154,9 @@ class Static_Press_S3_Admin {
 			! empty( $this->options['region'] ) ? $this->options['region'] : null,
 			! empty( $this->options['endpoint'] ) ? $this->options['endpoint'] : null
 		);
-		$regions = $this->regions;
 		$buckets = false;
-		if ( $s3 ) {
-			$regions = $s3->get_regions();
-			$buckets = $s3->list_buckets();
-		}
+		$regions = $s3->get_regions();
+		$buckets = $s3->list_buckets();
 		if ( 'other' != $this->options['region'] ) {
 			unset( $option_keys['endpoint'] );
 		}
@@ -189,7 +186,7 @@ class Static_Press_S3_Admin {
 		<?php submit_button(); ?>
 		</form>
 		</div>
-<?php
+		<?php
 	}
 
 	/**
@@ -207,15 +204,15 @@ class Static_Press_S3_Admin {
 		$input_field = sprintf( '<td><input type="text" name="%1$s" value="%2$s" id="%1$s" size=100 /></td>' . "\n", $field, esc_attr( $this->options[ $field ] ) );
 		switch ( $field ) {
 			case 'region':
-				if ( $regions && count( $regions ) > 0) {
+				if ( $regions && count( $regions ) > 0 ) {
 					$input_field  = sprintf( '<td><select name="%1$s">', $field );
 					$input_field .= '<option value=""></option>';
 					foreach ( $regions as $region ) {
 						$input_field .= sprintf(
 							'<option value="%1$s"%2$s>%3$s</option>',
-							esc_attr($region),
+							esc_attr( $region ),
 							$region == $this->options[ $field ] ? ' selected' : '',
-							__( $region, self::TEXT_DOMAIN )
+							$region
 						);
 					}
 					$input_field .= '</select></td>';
@@ -229,7 +226,7 @@ class Static_Press_S3_Admin {
 						$input_field .= sprintf(
 							'<option value="%1$s"%2$s>%1$s</option>',
 							esc_attr( $bucket['Name'] ),
-							$bucket['Name'] == $this->options[$field] ? ' selected' : ''
+							$bucket['Name'] == $this->options[ $field ] ? ' selected' : ''
 						);
 					}
 					$input_field .= '</select></td>';

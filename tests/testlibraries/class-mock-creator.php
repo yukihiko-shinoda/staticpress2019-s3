@@ -7,9 +7,11 @@
 
 namespace static_press_s3\tests\testlibraries;
 
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-batch-put-object.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
 use Mockery;
 use ReflectionClass;
+use static_press_s3\includes\Static_Press_S3_Batch_Put_Object;
 use static_press_s3\includes\Static_Press_S3_Helper;
 
 /**
@@ -53,6 +55,7 @@ class Mock_Creator {
 		$s3_helper = new Static_Press_S3_Helper();
 		return Mockery::mock( $s3_helper->init_s3( '', '' ) );
 	}
+
 	/**
 	 * Creates S3 helper partial mock which S3 client replaced.
 	 * 
@@ -66,6 +69,24 @@ class Mock_Creator {
 		$reflection_property->setAccessible( true );
 		$reflection_property->setValue( $s3_helper, $s3_client );
 		return $s3_helper;
+	}
+
+	/**
+	 * Creates S3 batch PutObject partial mock which S3 client replaced.
+	 * 
+	 * @param S3_Client $s3_client S3 client.
+	 * @param string    $bucket     S3 bucket.
+	 * @return Static_Press_S3_Helper S3 helper partial mock.
+	 */
+	public static function create_s3_batch_put_object_partial_mock( $s3_client, $bucket ) {
+		$s3_client->shouldReceive( 'doesBucketExist' )->with( $bucket, true )->andReturn( true );
+		$s3_helper           = self::create_s3_helper_partial_mock( $s3_client );
+		$s3_batch_put_object = new Static_Press_S3_Batch_Put_Object( $s3_helper, $bucket );
+		$reflection          = new ReflectionClass( $s3_batch_put_object );
+		$reflection_property = $reflection->getProperty( 's3_helper' );
+		$reflection_property->setAccessible( true );
+		$reflection_property->setValue( $s3_batch_put_object, $s3_helper );
+		return $s3_batch_put_object;
 	}
 
 	/**

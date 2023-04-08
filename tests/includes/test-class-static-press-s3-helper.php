@@ -198,7 +198,7 @@ class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 		$file_path         = Path_Creator::create_file_path( $filename );
 		$expected_argument = Mock_Creator::create_expected_argument( $bucket, $file_path );
 		$s3_helper         = Mock_Creator::create_s3_helper_partial_mock( Mock_Creator::create_s3_client_partial_mock_put_object( $expected_argument, $response ) );
-		$this->assertEquals( $response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
+		$this->assertEquals( $response, $s3_helper->upload( $bucket, Path_Creator::create_file_path( $filename ), $upload_path ) );
 	}
 
 	/**
@@ -210,21 +210,9 @@ class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 		$bucket            = '';
 		$response          = 'response';
 		$expected_argument = array();
-		$expected_response = false;
 		$s3_helper         = Mock_Creator::create_s3_helper_partial_mock( Mock_Creator::create_s3_client_partial_mock_put_object( $expected_argument, $response ) );
-		$this->assertEquals( $expected_response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
-	}
-
-	/**
-	 * Function test_upload() should return false when S3 client not exist.
-	 */
-	public function test_upload_s3_client_not_exist() {
-		$filename          = 'file.txt';
-		$upload_path       = '';
-		$bucket            = '';
-		$expected_response = false;
-		$s3_helper         = Mock_Creator::create_s3_helper_partial_mock( false );
-		$this->assertEquals( $expected_response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
+		$this->expectException( InvalidArgumentException::class );
+		$s3_helper->upload( $bucket, Path_Creator::create_file_path( $filename ), $upload_path );
 	}
 
 	/**

@@ -48,41 +48,41 @@ class Static_Press_S3_Test extends Polyfill_WP_UnitTestCase {
 	 * Test steps for init_s3().
 	 */
 	public function test_s3() {
-		$s3_bucket          = 'example.com';
-		$static_press_s3    = $this->create_static_press_s3();
-		$reflection         = new \ReflectionClass( get_class( $static_press_s3 ) );
-		$expected_argument  = array( $s3_bucket, true );
-		$s3_helper          = Mock_Creator::create_s3_helper_partial_mock( Mock_Creator::create_s3_client_partial_mock_does_bucket_exist( $expected_argument, true ) );
-		$reflector_property = $reflection->getProperty( 's3' );
+		$s3_bucket           = 'example.com';
+		$static_press_s3     = $this->create_static_press_s3( $s3_bucket );
+		$reflection          = new \ReflectionClass( get_class( $static_press_s3 ) );
+		$mock_s3_client      = Mock_Creator::create_s3_client_partial_mock();
+		$s3_batch_put_object = Mock_Creator::create_s3_batch_put_object_partial_mock( $mock_s3_client, $s3_bucket );
+		$reflector_property  = $reflection->getProperty( 's3_batch_put_object' );
 		$reflector_property->setAccessible( true );
-		$reflector_property->setValue( $static_press_s3, $s3_helper );
-		$method = $reflection->getMethod( 's3' );
+		$reflector_property->setValue( $static_press_s3, $s3_batch_put_object );
+		$method = $reflection->getMethod( 'get_s3_batch_put_object' );
 		$method->setAccessible( true );
 		$this->assertNotFalse( $method->invokeArgs( $static_press_s3, array( $s3_bucket ) ) );
 	}
 
 	/**
-	 * Test steps for init_s3().
+	 * Test steps for s3_upload().
 	 */
 	public function test_s3_upload() {
-		$s3_bucket          = 'example.com';
-		$static_press_s3    = $this->create_static_press_s3( $s3_bucket );
-		$filename           = 'file.txt';
-		$response           = 'response';
-		$file_path          = Path_Creator::create_file_path( $filename );
-		$reflection         = new \ReflectionClass( get_class( $static_press_s3 ) );
-		$reflector_property = $reflection->getProperty( 's3' );
-		$reflector_property->setAccessible( true );
-		$mock_s3_client = Mock_Creator::create_s3_client_partial_mock();
-		$mock_s3_client->shouldReceive( 'doesBucketExist' )->with( $s3_bucket, true )->andReturn( true );
+		$s3_bucket         = 'example.com';
+		$static_press_s3   = $this->create_static_press_s3( $s3_bucket );
+		$filename          = 'file.txt';
+		$response          = 'response';
+		$file_path         = Path_Creator::create_file_path( $filename );
+		$url               = 'https://' . $s3_bucket . '/' . $filename;
+		$mock_s3_client    = Mock_Creator::create_s3_client_partial_mock();
 		$expected_argument = Mock_Creator::create_expected_argument( $s3_bucket, $filename );
 		$mock_s3_client->shouldReceive( 'putObject' )->with( $expected_argument )->andReturn( $response );
-		$s3_helper = Mock_Creator::create_s3_helper_partial_mock( $mock_s3_client );
-		$reflector_property->setValue( $static_press_s3, $s3_helper );
+		$s3_batch_put_object = Mock_Creator::create_s3_batch_put_object_partial_mock( $mock_s3_client, $s3_bucket );
+		$reflection          = new \ReflectionClass( get_class( $static_press_s3 ) );
+		$reflector_property  = $reflection->getProperty( 's3_batch_put_object' );
+		$reflector_property->setAccessible( true );
+		$reflector_property->setValue( $static_press_s3, $s3_batch_put_object );
 		$reflection = new \ReflectionClass( get_class( $static_press_s3 ) );
 		$method     = $reflection->getMethod( 's3_upload' );
 		$method->setAccessible( true );
-		$this->assertNotFalse( $method->invokeArgs( $static_press_s3, array( $file_path, 'https://' . $s3_bucket . '/' . $filename ) ) );
+		$this->assertNotFalse( $method->invokeArgs( $static_press_s3, array( $file_path, $url ) ) );
 	}
 
 	/**
