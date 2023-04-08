@@ -7,6 +7,12 @@
 
 namespace static_press_s3\includes;
 
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-batch-put-object.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
+
+use static_press_s3\includes\Static_Press_S3_Batch_Put_Object;
+use static_press_s3\includes\Static_Press_S3_Helper;
+
 /**
  * StaticPress S3.
  */
@@ -15,11 +21,17 @@ class Static_Press_S3 {
 	static $instance;
 
 	/**
+	 * S3 batch PutObject.
+	 * 
+	 * @var Static_Press_S3_Batch_Put_Object|null
+	 */
+	private $s3_batch_put_object;
+	/**
 	 * S3 Helper.
 	 * 
-	 * @var Static_Press_S3_Helper
+	 * @var Static_Press_S3_Helper|null
 	 */
-	private $s3;
+	private $s3_helper;
 	/**
 	 * This plugin options.
 	 * 
@@ -31,11 +43,37 @@ class Static_Press_S3 {
 	 * Inits.
 	 * 
 	 * @param string[] $options Options set in Admin page.
+	 * @throws \InvalidArgumentException In case when $option is empty.
 	 */
 	public function __construct( $options ) {
 		self::$instance = $this;
-		$this->options  = $options;
+		if ( ! $options ) {
+			throw new \InvalidArgumentException( '$options can\'t be empty.' );
+		}
+		$this->options = $options;
 		add_action( 'StaticPress::file_put', array( $this, 's3_upload' ), 10, 2 );
+	}
+
+	/** 
+	 * Get S3 object (singleton).
+	 * 
+	 * @return Static_Press_S3_Batch_Put_Object
+	 */
+	private function get_s3_batch_put_object() {
+		if ( isset( $this->s3_batch_put_object ) ) {
+			return $this->s3_batch_put_object;
+		}
+		$s3_helper = new Static_Press_S3_Helper(
+			$this->options['access_key'],
+			$this->options['secret_key'],
+			isset( $this->options['region'] ) ? $this->options['region'] : null,
+			isset( $this->options['endpoint'] ) ? $this->options['endpoint'] : null
+		);
+		return new Static_Press_S3_Batch_Put_Object(
+			$s3_helper,
+			$this->options['bucket'],
+			$this->options['put_object_acl']
+		);
 	}
 
 	/**
@@ -51,69 +89,33 @@ class Static_Press_S3 {
 	 * Uploads file to S3.
 	 * 
 	 * @param string $file_name File name.
-	 * @param string $url S3 key.
+	 * @param string $url       S3 key.
 	 */
 	public function s3_upload( $file_name, $url ) {
-		$this->s3 = $this->s3();
-		if ( ! $this->s3 ) {
-			return false;
-		}
-		$s3_bucket = isset( $this->options['bucket'] ) ? $this->options['bucket'] : false;
-		if ( isset( $s3_bucket ) && $this->s3->current_bucket() !== $s3_bucket ) {
-			$this->s3->set_current_bucket( $s3_bucket );
-		}
-		$s3_key = preg_replace( '#^(https?://[^/]+/|/)#i', '', urldecode( $url ) );
-		if ( ! file_exists( $file_name ) ) {
-			return false;
-		}
-		return $this->s3->upload( $file_name, $s3_key );
-	}
-
-	/** 
-	 * Initializing S3 object.
-	 * 
-	 * @return Static_Press_S3_Helper|false
-	 */
-	private function s3() {
-		if ( isset( $this->s3 ) ) {
-			return $this->s3;
-		}
-		if ( ! $this->options ) {
-			return false;
-		}
-		return new Static_Press_S3_Helper(
-			isset( $this->options['access_key'] ) ? $this->options['access_key'] : null,
-			isset( $this->options['secret_key'] ) ? $this->options['secret_key'] : null,
-			isset( $this->options['region'] ) ? $this->options['region'] : null,
-			isset( $this->options['endpoint'] ) ? $this->options['endpoint'] : null
-		);
+		$this->s3_batch_put_object = $this->get_s3_batch_put_object();
+		$upload_path               = preg_replace( '#^(https?://[^/]+/|/)#i', '', urldecode( $url ) );
+		return $this->s3_batch_put_object->upload( $file_name, $upload_path );
 	}
 
 	// Download file to S3
 	private function s3_download($filename, $S3_bucket, $S3_key){
-		$download_result = false;
-		if ($s3 = $this->s3($S3_bucket)) {
-			if (!$s3->object_exists($S3_key))
-				return false;
-			$download_result = $s3->download($S3_key, $filename);
-			if (self::$debug_mode && function_exists('dbgx_trace_var')) {
-				dbgx_trace_var($download_result);
-			}
+		if (!$s3_helper->object_exists($S3_key))
+			return false;
+		$download_result = $s3_helper->download($S3_key, $filename);
+		if (self::$debug_mode && function_exists('dbgx_trace_var')) {
+			dbgx_trace_var($download_result);
 		}
 		return $download_result;
 	}
 
 	// Delete S3 object
 	private function s3_delete($S3_bucket, $S3_key){
-		$delete_result = false;
-		if ($s3 = $this->s3($S3_bucket)) {
-			$delete_result =
-				$s3->object_exists($S3_key)
-				? $s3->delete($S3_key)
-				: true;
-			if (self::$debug_mode && function_exists('dbgx_trace_var')) {
-				dbgx_trace_var($delete_result);
-			}
+		$delete_result =
+			$s3_helper->object_exists($S3_key)
+			? $s3_helper->delete($S3_key)
+			: true;
+		if (self::$debug_mode && function_exists('dbgx_trace_var')) {
+			dbgx_trace_var($delete_result);
 		}
 		return $delete_result;
 	}

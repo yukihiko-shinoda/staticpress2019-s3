@@ -25,7 +25,7 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 	 * Test steps for init_s3().
 	 */
 	public function test_init_s3_empty_options() {
-		$this->expectOutputRegex( $this->create_regex( '', '' ) );
+		$this->expectOutputRegex( $this->create_regex( '', '', false ) );
 		$admin = new Static_Press_S3_Admin();
 		$admin->options_page();
 	}
@@ -38,11 +38,12 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 		$this->assertEquals(
 			$admin->option_keys(),
 			array(
-				'access_key' => 'AWS Access Key',
-				'secret_key' => 'AWS Secret Key',
-				'region'     => 'AWS Region',
-				'endpoint'   => 'S3 Endpoint',
-				'bucket'     => 'S3 Bucket',
+				'access_key'     => 'AWS Access Key',
+				'secret_key'     => 'AWS Secret Key',
+				'region'         => 'AWS Region',
+				'endpoint'       => 'S3 Endpoint',
+				'bucket'         => 'S3 Bucket',
+				'put_object_acl' => 'Put Object ACL',
 			)
 		);
 	}
@@ -61,7 +62,7 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 				'bucket'     => 'bucket',
 			)
 		);
-		$this->expectOutputRegex( $this->create_regex( 'accessKey', 'secretKey' ) );
+		$this->expectOutputRegex( $this->create_regex( 'accessKey', 'secretKey', false ) );
 		$admin = new Static_Press_S3_Admin();
 		$admin->options_page();
 	}
@@ -69,15 +70,17 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 	/**
 	 * Creates regex.
 	 * 
-	 * @param string $access_key Access key.
-	 * @param string $secret_key Secret key.
+	 * @param string $access_key     Access key.
+	 * @param string $secret_key     Secret key.
+	 * @param bool   $put_object_acl PutObjectACL.
 	 * @return string Regex.
 	 */
-	private function create_regex( $access_key, $secret_key ) {
+	private function create_regex( $access_key, $secret_key, $put_object_acl ) {
 		$regex = preg_quote( file_get_contents( Path_Creator::create_file_path( 'options-page.html' ) ), null );
 		$regex = str_replace( 'WP_NONCE', '[0-9a-z]*', $regex );
 		$regex = str_replace( 'ACCESS_KEY_VALUE', $access_key, $regex );
 		$regex = str_replace( 'SECRET_KEY_VALUE', $secret_key, $regex );
+		$regex = str_replace( 'PUT_OBJECT_ACL_VALUE', $put_object_acl ? ' checked' : '', $regex );
 		return "|$regex|";
 	}
 }

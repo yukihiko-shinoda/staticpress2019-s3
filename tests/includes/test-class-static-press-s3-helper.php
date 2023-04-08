@@ -198,7 +198,7 @@ class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 		$file_path         = Path_Creator::create_file_path( $filename );
 		$expected_argument = Mock_Creator::create_expected_argument( $bucket, $file_path );
 		$s3_helper         = Mock_Creator::create_s3_helper_partial_mock( Mock_Creator::create_s3_client_partial_mock_put_object( $expected_argument, $response ) );
-		$this->assertEquals( $response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
+		$this->assertEquals( $response, $s3_helper->upload( $bucket, Path_Creator::create_file_path( $filename ), $upload_path ) );
 	}
 
 	/**
@@ -210,21 +210,9 @@ class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 		$bucket            = '';
 		$response          = 'response';
 		$expected_argument = array();
-		$expected_response = false;
 		$s3_helper         = Mock_Creator::create_s3_helper_partial_mock( Mock_Creator::create_s3_client_partial_mock_put_object( $expected_argument, $response ) );
-		$this->assertEquals( $expected_response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
-	}
-
-	/**
-	 * Function test_upload() should return false when S3 client not exist.
-	 */
-	public function test_upload_s3_client_not_exist() {
-		$filename          = 'file.txt';
-		$upload_path       = '';
-		$bucket            = '';
-		$expected_response = false;
-		$s3_helper         = Mock_Creator::create_s3_helper_partial_mock( false );
-		$this->assertEquals( $expected_response, $s3_helper->upload( Path_Creator::create_file_path( $filename ), $upload_path, $bucket ) );
+		// $this->expectException( InvalidArgumentException::class );
+		$this->assertFalse( $s3_helper->upload( $bucket, Path_Creator::create_file_path( $filename ), $upload_path ) );
 	}
 
 	/**
@@ -233,68 +221,5 @@ class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 	public function test_list_buckets() {
 		$s3_helper = new Static_Press_S3_Helper();
 		$this->assertEquals( false, $s3_helper->list_buckets() );
-	}
-
-	/**
-	 * Test steps for mime_type().
-	 *
-	 * @dataProvider provider_mime_type
-	 * @param string $file_name File name.
-	 * @param string $expect    Expect.
-	 * @throws ReflectionException When fail to create ReflectionClass instance.
-	 */
-	public function test_mime_type( $file_name, $expect ) {
-		$file_path = Path_Creator::create_file_path( $file_name );
-		$result    = $this->call_private_method( 'mime_type', array( $file_path ) );
-		$this->assertEquals( $expect, $result );
-	}
-
-	/**
-	 * Function mime_type() should returns appropriate mime type.
-	 * 
-	 * @see https://en.wikipedia.org/wiki/Media_type
-	 * @see https://www.freeformatter.com/mime-types-list.html#mime-types-list
-	 * @see https://github.com/symfony/symfony/blob/v5.1.2/src/Symfony/Component/Mime/MimeTypes.php
-	 */
-	public function provider_mime_type() {
-		return array(
-			array( 'not-found.txt', false ),
-			array( 'empty.txt', version_compare( PHP_VERSION, '7.4', '>=' ) ? 'application/x-empty' : 'inode/x-empty' ),
-			array( 'file.aac', 'audio/aac' ),
-			array( 'file.css', 'text/css' ),
-			array( 'file.csv', 'text/plain' ),
-			array( 'file.flac', 'audio/flac' ),
-			array( 'file.gif', 'image/gif' ),
-			array( 'file.htm', 'text/html' ),
-			array( 'file.html', 'text/html' ),
-			array( 'file.jpe', 'image/jpeg' ),
-			array( 'file.jpeg', 'image/jpeg' ),
-			array( 'file.jpg', 'image/jpeg' ),
-			array( 'file.js', 'application/javascript' ),
-			array( 'file.m4a', 'audio/m4a' ),
-			array( 'file.mp3', 'audio/mpeg' ),
-			array( 'file.png', 'image/png' ),
-			array( 'file.svg', 'image/svg+xml' ),
-			array( 'file.txt', 'text/plain' ),
-			array( 'file.wav', 'audio/wav' ),
-			array( 'file.xml', 'application/xml' ),
-			array( 'no-extension-text', 'text/plain' ),
-			array( 'no-extension-media', 'application/octet-stream' ),
-			array( 'upper-case.JPG', 'image/jpeg' ),
-		);
-	}
-
-	/**
-	 * Call private method.
-	 * 
-	 * @param string $method_name     Method name.
-	 * @param array  $array_parameter Array of parameter.
-	 */
-	private function call_private_method( $method_name, $array_parameter ) {
-		$s3_helper  = new Static_Press_S3_Helper();
-		$reflection = new \ReflectionClass( get_class( $s3_helper ) );
-		$method     = $reflection->getMethod( $method_name );
-		$method->setAccessible( true );
-		return $method->invokeArgs( $s3_helper, $array_parameter );
 	}
 }

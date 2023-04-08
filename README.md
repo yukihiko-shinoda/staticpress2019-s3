@@ -18,24 +18,91 @@ This plugin is a revival of [StaticPress-S3](https://github.com/megumiteam/stati
 
 ## Installation
 
-1. Go to Admin page on your WordPress.
+1. Sign into your WordPress admin dashboard.
 2. Click [Plugins] -> [Add New].
 3. Search by keyword: `staticpress2019`.
 4. Click [Install Now] button for `StaticPress2019` and `StaticPress2019-S3`.
 5. Click [Activate] button for `StaticPress2019` and `StaticPress2019-S3`.
 
+## AWS settings
+
+### IAM User
+
+Create IAM User for deploy and issue its access key.
+Then, attach following IAM policy:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListAllMyBuckets"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Resource": "arn:aws:s3:::<your-bucket-name>"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:::<your-bucket-name>/*"
+        }
+    ]
+}
+```
+
+### S3 bucket policy
+
+Create S3 bucket for hosting, set bucket object ownership control as `BucketOwnerEnforced`, and set bucket policy as following:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::<your-aws-account-id>:user/<your-iam-user-name>"
+            },
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::<your-bucket-name>"
+        },
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::<your-aws-account-id>:user/<your-iam-user-name>"
+            },
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::<your-bucket-name>/*"
+        }
+    ]
+}
+```
+
+Note: Blocking all public access doesn't reject upload.
+
 ## How to use
 
-1. Click [StaticPress2019] -> [StaticPress2019 Options]
-2. Set [Static URL] as URL to publish in S3
-3. Set [Save DIR (Document root)] as appropriate directory to dump static files
-4. Click [Save Changes]
-5. Set [AWS Access Key], [AWS Secret Key], [AWS Region] in [StaticPress S3 Option]
-6. Click [Save Changes]
-7. Choose [S3 Bucket]
-8. Click [Save Changes]
-9. Click [StaticPress2019] -> [StaticPress2019]
-10. Click [Rebuild]
+1. Sign into your WordPress admin dashboard.
+2. Click [StaticPress2019] -> [StaticPress2019 Options].
+3. Set [Static URL] as URL to publish in S3.
+4. Set [Save DIR (Document root)] as appropriate directory to dump static files.
+5. Click [Save Changes].
+6. Set [AWS Access Key], [AWS Secret Key], [AWS Region] in [StaticPress S3 Option].
+7. Click [Save Changes].
+8. Choose [S3 Bucket].
+9. Click [Save Changes].
+10. Click [StaticPress2019] -> [StaticPress2019].
+11. Click [Rebuild].
 
 ## Frequently Asked Questions
 
@@ -45,3 +112,11 @@ This plugin is a revival of [StaticPress-S3](https://github.com/megumiteam/stati
 
 This plugin uses [magic file](https://unix.stackexchange.com/questions/393288/explain-please-what-is-a-magic-file-in-unix) to detect mime type.
 If mime type is not correct, you can specify different magic file from default by using environment variable `MAGIC`.
+
+### What is [Put Object ACL] in StaticPress2019 Options form for?
+
+It's just for backward compatibility. New user shouldn't use it:
+
+[Disabling ACLs for all new buckets and enforcing Object Ownership - Amazon Simple Storage Service](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ensure-object-ownership.html)
+
+Updated user may need to use it. According to the old specifications, StaticPress2019-S3 put object ACL when upload static file to S3.

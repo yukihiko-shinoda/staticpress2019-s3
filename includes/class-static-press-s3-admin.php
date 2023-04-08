@@ -7,6 +7,11 @@
 
 namespace static_press_s3\includes;
 
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
+
+use InputValidator;
+use static_press_s3\includes\Static_Press_S3_Helper;
+
 /**
  * StaticPress S3 Admin page.
  */
@@ -23,26 +28,13 @@ class Static_Press_S3_Admin {
 
 	private $options = array();
 	private $admin_action;
-	private $regions = array(
-		'US_EAST_1',
-		'US_WEST_1',
-		'US_WEST_2',
-		'EU_WEST_1',
-		'AP_SOUTHEAST_1',
-		'AP_SOUTHEAST_2',
-		'AP_NORTHEAST_1',
-		'SA_EAST_1',
-		'US_GOV_WEST_1'
-		);
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		self::$instance = $this;
-
-		$this->options         = $this->get_option();
-		$this->plugin_basename = Static_Press_S3::plugin_basename();
+		$this->options  = $this->get_option();
 		add_action( 'StaticPress::options_save', array( $this, 'options_save' ) );
 		add_action( 'StaticPress::options_page', array( $this, 'options_page' ) );
 	}
@@ -54,11 +46,12 @@ class Static_Press_S3_Admin {
 	 */
 	public static function option_keys() {
 		return array(
-			'access_key' => __( 'AWS Access Key', 'staticpress_s3' ),
-			'secret_key' => __( 'AWS Secret Key', 'staticpress_s3' ),
-			'region'     => __( 'AWS Region', 'staticpress_s3' ),
-			'endpoint'   => __( 'S3 Endpoint', 'staticpress_s3' ),
-			'bucket'     => __( 'S3 Bucket', 'staticpress_s3' ),
+			'access_key'     => __( 'AWS Access Key', 'staticpress_s3' ),
+			'secret_key'     => __( 'AWS Secret Key', 'staticpress_s3' ),
+			'region'         => __( 'AWS Region', 'staticpress_s3' ),
+			'endpoint'       => __( 'S3 Endpoint', 'staticpress_s3' ),
+			'bucket'         => __( 'S3 Bucket', 'staticpress_s3' ),
+			'put_object_acl' => __( 'Put Object ACL', 'staticpress_s3' ),
 		);
 	}
 
@@ -80,63 +73,64 @@ class Static_Press_S3_Admin {
 	/**
 	 * Saves options.
 	 */
-	public function options_save(){
+	public function options_save() {
 		$option_keys   = $this->option_keys();
 		$this->options = $this->get_option();
 
-		$iv = new InputValidator('POST');
-		$iv->set_rules(self::NONCE_NAME, 'required');
+		$iv = new InputValidator( 'POST' );
+		$iv->set_rules( self::NONCE_NAME, 'required' );
 
-		// Update options
-		if (!is_wp_error($iv->input(self::NONCE_NAME)) && check_admin_referer(self::NONCE_ACTION, self::NONCE_NAME)) {
-			// Get posted options
-			$fields = array_keys($option_keys);
-			foreach ($fields as $field) {
-				switch ($field) {
+		if ( is_wp_error( $iv->input( self::NONCE_NAME ) ) || ! check_admin_referer( self::NONCE_ACTION, self::NONCE_NAME ) ) {
+			return;
+		}
+		// Get posted options.
+		$fields = array_keys( $option_keys );
+		foreach ( $fields as $field ) {
+			switch ( $field ) {
 				case 'access_key':
 				case 'secret_key':
-					$iv->set_rules($field, array('trim','esc_html','required'));
+					$iv->set_rules( $field, array( 'trim', 'esc_html', 'required' ) );
 					break;
 				default:
-					$iv->set_rules($field, array('trim','esc_html'));
+					$iv->set_rules( $field, array( 'trim', 'esc_html' ) );
 					break;
-				}
 			}
-			$options = $iv->input($fields);
-			$err_message = '';
-			foreach ($option_keys as $key => $field) {
-				if (is_wp_error($options[$key])) {
-					$error_data = $options[$key];
-					$err = '';
-					foreach ($error_data->errors as $errors) {
-						foreach ($errors as $error) {
-							$err .= (!empty($err) ? '<br />' : '') . __('Error! : ', self::TEXT_DOMAIN);
-							$err .= sprintf(
-								__(str_replace($key, '%s', $error), self::TEXT_DOMAIN),
-								$field
-								);
-						}
-					}
-					$err_message .= (!empty($err_message) ? '<br />' : '') . $err;
-				}
-				if (!isset($options[$key]) || is_wp_error($options[$key]))
-					$options[$key] = '';
-			}
-			if (self::$debug_mode && function_exists('dbgx_trace_var')) {
-				dbgx_trace_var($options);
-			}
-
-			// Update options
-			if ($this->options !== $options) {
-				update_option(self::OPTION_KEY, $options);
-				printf(
-					'<div id="message" class="updated fade"><p><strong>%s</strong></p></div>'."\n",
-					empty($err_message) ? __('Done!', self::TEXT_DOMAIN) : $err_message
-					);
-				$this->options = $options;
-			}
-			unset($options);
 		}
+		$options     = $iv->input( $fields );
+		$err_message = '';
+		foreach ( $option_keys as $key => $field ) {
+			if ( is_wp_error( $options[ $key ] ) ) {
+				$error_data = $options[ $key ];
+				$err        = '';
+				foreach ( $error_data->errors as $errors ) {
+					foreach ( $errors as $error ) {
+						$err .= ( ! empty( $err ) ? '<br />' : '' ) . __( 'Error! : ', 'staticpress_s3' );
+						$err .= sprintf(
+							str_replace( $key, '%s', $error ),
+							$field
+						);
+					}
+				}
+				$err_message .= ( ! empty( $err_message ) ? '<br />' : '' ) . $err;
+			}
+			if ( ! isset( $options[ $key ] ) || is_wp_error( $options[ $key ] ) ) {
+				$options[ $key ] = '';
+			}
+		}
+		if ( self::$debug_mode && function_exists( 'dbgx_trace_var' ) ) {
+			dbgx_trace_var( $options );
+		}
+
+		// Update options.
+		if ( $this->options !== $options ) {
+			update_option( self::OPTION_KEY, $options );
+			printf(
+				'<div id="message" class="updated fade"><p><strong>%s</strong></p></div>' . "\n",
+				empty( $err_message ) ? __( 'Done!', 'staticpress_s3' ) : $err_message
+			);
+			$this->options = $options;
+		}
+		unset( $options );
 	}
 
 	/**
@@ -145,7 +139,6 @@ class Static_Press_S3_Admin {
 	public function options_page() {
 		$option_keys   = $this->option_keys();
 		$this->options = $this->get_option();
-		$title = __( 'StaticPress S3 Option', self::TEXT_DOMAIN );
 
 		// Get S3 Object.
 		$s3      = new Static_Press_S3_Helper(
@@ -154,88 +147,123 @@ class Static_Press_S3_Admin {
 			! empty( $this->options['region'] ) ? $this->options['region'] : null,
 			! empty( $this->options['endpoint'] ) ? $this->options['endpoint'] : null
 		);
-		$regions = $this->regions;
-		$buckets = false;
-		if ( $s3 ) {
-			$regions = $s3->get_regions();
-			$buckets = $s3->list_buckets();
-		}
-		if ( 'other' != $this->options['region'] ) {
-			unset( $option_keys['endpoint'] );
-		}
-		if ( ! $buckets ) {
-			unset( $option_keys['bucket'] );
-			unset( $option_keys['s3_url'] );
-		}
+		$regions = $s3->get_regions();
+		$buckets = $s3->list_buckets();
+		$this->render_options_page( $option_keys, $regions, $buckets );
+	}
+	/**
+	 * Renders options page.
+	 * 
+	 * @param string[]       $option_keys Option keys.
+	 * @param string[]       $regions     Regions.
+	 * @param string[]|false $buckets     S3 buckets.
+	 */
+	private function render_options_page( $option_keys, $regions, $buckets ) {
 		?>
 		<div class="wrap">
-		<h2><?php echo esc_html( $title ); ?></h2>
+		<h2><?php echo esc_html( __( 'StaticPress S3 Option', 'staticpress_s3' ) ); ?></h2>
 		<form method="post" action="<?php echo $this->admin_action; ?>">
 		<?php echo wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME, true, false ) . "\n"; ?>
 		<table class="wp-list-table fixed"><tbody>
 		<?php
-		foreach ( $option_keys as $field => $label ) {
-			$this->input_field(
-				$field,
-				$label,
-				array(
-					'regions' => $regions,
-					'buckets' => $buckets,
-				)
-			);
+		$this->input_field( 'access_key', $option_keys['access_key'], $this->input_field_default( 'access_key' ) );
+		$this->input_field( 'secret_key', $option_keys['secret_key'], $this->input_field_default( 'secret_key' ) );
+		$this->input_field( 'region', $option_keys['region'], $this->input_field_region( 'region', $regions ) );
+		if ( 'other' != $this->options['region'] ) {
+			unset( $option_keys['endpoint'] );
+		} else {
+			$this->input_field( 'endpoint', $option_keys['endpoint'], $this->input_field_default( 'endpoint' ) );
 		}
+		if ( ! $buckets ) {
+			unset( $option_keys['bucket'] );
+		} else {
+			$this->input_field( 'bucket', $option_keys['bucket'], $this->input_field_bucket( 'bucket', $buckets ) );
+		}
+		$this->input_field( 'put_object_acl', $option_keys['put_object_acl'], $this->input_field_checkbox( 'put_object_acl' ) );
 		?>
 		</tbody></table>
 		<?php submit_button(); ?>
 		</form>
 		</div>
-<?php
+		<?php
+	}
+
+	/**
+	 * Renders input fields.
+	 * 
+	 * @param string $field       Field.
+	 * @param string $label       Label.
+	 * @param string $input_field Input filed.
+	 */
+	private function input_field( $field, $label, $input_field ) {
+		$label = sprintf( '<th><label for="%1$s">%2$s</label></th>' . "\n", $field, $label );
+		echo "<tr>\n{$label}{$input_field}</tr>\n";
 	}
 
 	/**
 	 * Renders input fields.
 	 * 
 	 * @param string $field Field.
-	 * @param string $label Label.
-	 * @param array  $args  Arguments.
+	 * @return string
 	 */
-	private function input_field( $field, $label, $args = array() ) {
-		extract( $args );
-
-		$label = sprintf( '<th><label for="%1$s">%2$s</label></th>' . "\n", $field, $label );
-
-		$input_field = sprintf( '<td><input type="text" name="%1$s" value="%2$s" id="%1$s" size=100 /></td>' . "\n", $field, esc_attr( $this->options[ $field ] ) );
-		switch ( $field ) {
-			case 'region':
-				if ( $regions && count( $regions ) > 0) {
-					$input_field  = sprintf( '<td><select name="%1$s">', $field );
-					$input_field .= '<option value=""></option>';
-					foreach ( $regions as $region ) {
-						$input_field .= sprintf(
-							'<option value="%1$s"%2$s>%3$s</option>',
-							esc_attr($region),
-							$region == $this->options[ $field ] ? ' selected' : '',
-							__( $region, self::TEXT_DOMAIN )
-						);
-					}
-					$input_field .= '</select></td>';
-				}
-				break;
-			case 'bucket':
-				if ( $buckets && count( $buckets ) > 0 ) {
-					$input_field  = sprintf( '<td><select name="%1$s">', $field );
-					$input_field .= '<option value=""></option>';
-					foreach ( $buckets as $bucket ) {
-						$input_field .= sprintf(
-							'<option value="%1$s"%2$s>%1$s</option>',
-							esc_attr( $bucket['Name'] ),
-							$bucket['Name'] == $this->options[$field] ? ' selected' : ''
-						);
-					}
-					$input_field .= '</select></td>';
-				}
-				break;
+	private function input_field_default( $field ) {
+		return sprintf( '<td><input type="text" name="%1$s" value="%2$s" id="%1$s" size=100 /></td>' . "\n", $field, esc_attr( $this->options[ $field ] ) );
+	}
+	/**
+	 * Renders input fields.
+	 * 
+	 * @param string $field Field.
+	 * @return string
+	 */
+	private function input_field_checkbox( $field ) {
+		return sprintf( '<td><input type="checkbox" name="%1$s" id="%1$s"%2$s /></td>' . "\n", $field, $this->options[ $field ] ? ' checked' : '' );
+	}
+	/**
+	 * Renders input fields.
+	 * 
+	 * @param string   $field   Field.
+	 * @param string[] $regions Regions.
+	 * @return string
+	 */
+	private function input_field_region( $field, $regions ) {
+		if ( ! ( $regions && count( $regions ) > 0 ) ) {
+			return '';
 		}
-		echo "<tr>\n{$label}{$input_field}</tr>\n";
+		$input_field  = sprintf( '<td><select name="%1$s">', $field );
+		$input_field .= '<option value=""></option>';
+		foreach ( $regions as $region ) {
+			$input_field .= sprintf(
+				'<option value="%1$s"%2$s>%3$s</option>',
+				esc_attr( $region ),
+				$region == $this->options[ $field ] ? ' selected' : '',
+				$region
+			);
+		}
+		$input_field .= '</select></td>';
+		return $input_field;
+	}
+
+	/**
+	 * Renders input fields.
+	 * 
+	 * @param string         $field   Region.
+	 * @param string[]|false $buckets Bucket.
+	 * @return string
+	 */
+	private function input_field_bucket( $field, $buckets ) {
+		if ( ! ( $buckets && count( $buckets ) > 0 ) ) {
+			return '';
+		}
+		$input_field  = sprintf( '<td><select name="%1$s">', $field );
+		$input_field .= '<option value=""></option>';
+		foreach ( $buckets as $bucket ) {
+			$input_field .= sprintf(
+				'<option value="%1$s"%2$s>%1$s</option>',
+				esc_attr( $bucket['Name'] ),
+				$bucket['Name'] == $this->options[ $field ] ? ' selected' : ''
+			);
+		}
+		$input_field .= '</select></td>';
+		return $input_field;
 	}
 }
