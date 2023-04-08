@@ -8,7 +8,7 @@
 namespace static_press_s3\includes;
 
 /**
- * Myme type checker.
+ * Mime type checker.
  */
 class Static_Press_S3_Mime_Type_Checker {
 	/**

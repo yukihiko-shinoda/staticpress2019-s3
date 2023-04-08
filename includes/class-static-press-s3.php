@@ -7,6 +7,12 @@
 
 namespace static_press_s3\includes;
 
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-batch-put-object.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
+
+use static_press_s3\includes\Static_Press_S3_Batch_Put_Object;
+use static_press_s3\includes\Static_Press_S3_Helper;
+
 /**
  * StaticPress S3.
  */
@@ -63,7 +69,11 @@ class Static_Press_S3 {
 			isset( $this->options['region'] ) ? $this->options['region'] : null,
 			isset( $this->options['endpoint'] ) ? $this->options['endpoint'] : null
 		);
-		return new Static_Press_S3_Batch_Put_Object( $s3_helper, $this->options['bucket'] );
+		return new Static_Press_S3_Batch_Put_Object(
+			$s3_helper,
+			$this->options['bucket'],
+			$this->options['put_object_acl']
+		);
 	}
 
 	/**

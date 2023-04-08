@@ -92,19 +92,22 @@ class Mock_Creator {
 	/**
 	 * Creates expected argument.
 	 * 
-	 * @param string $bucket Bucket name.
-	 * @param string $file_path File path.
+	 * @param string $bucket         Bucket name.
+	 * @param string $file_path      File path.
+	 * @param bool   $put_public_acl Put public ACL.
 	 */
-	public static function create_expected_argument( $bucket, $file_path ) {
+	public static function create_expected_argument( $bucket, $file_path, $put_public_acl = false ) {
 		return Mockery::on(
-			function ( $argument ) use ( $bucket, $file_path ) {
+			function ( $argument ) use ( $bucket, $file_path, $put_public_acl ) {
 				$bucket_is_set        = isset( $argument['Bucket'] ) && $bucket === $argument['Bucket'];
 				$storage_class_is_set = isset( $argument['StorageClass'] ) && 'STANDARD' === $argument['StorageClass'];
 				$acl_is_set           = isset( $argument['ACL'] ) && 'public-read' === $argument['ACL'];
+				$acl_is_not_set       = ! isset( $argument['ACL'] );
+				$acl_is_appropriate   = $put_public_acl ? $acl_is_set : $acl_is_not_set;
 				$key_is_set           = isset( $argument['Key'] ) && $file_path === $argument['Key'];
 				$body_is_set          = isset( $argument['Body'] );
 				$content_type_is_set  = isset( $argument['ContentType'] ) && 'text/plain' === $argument['ContentType'];
-				return $bucket_is_set && $storage_class_is_set && $acl_is_set && $key_is_set && $body_is_set && $content_type_is_set;
+				return $bucket_is_set && $storage_class_is_set && $acl_is_appropriate && $key_is_set && $body_is_set && $content_type_is_set;
 			}
 		);
 	}

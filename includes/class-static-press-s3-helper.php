@@ -77,12 +77,6 @@ class Static_Press_S3_Helper {
 	private $options = array(
 		'Bucket'       => '',
 		'StorageClass' => 'STANDARD',
-		/**
-		 * Required to set public-read:
-		 * - Setting permissions for website access - Amazon Simple Storage Service
-		 *   https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html#object-acl
-		 */
-		'ACL'          => 'public-read',
 	);
 
 	/**
@@ -155,12 +149,14 @@ class Static_Press_S3_Helper {
 	/**
 	 * Uploads.
 	 * 
-	 * @param string      $bucket      Bucket.
-	 * @param string      $filename    Filename.
-	 * @param string|null $upload_path Upload path.
+	 * @param string      $bucket         Bucket.
+	 * @param string      $filename       Filename.
+	 * @param string|null $upload_path    Upload path.
+	 * @param bool        $put_public_acl Put public ACL.
 	 * @throws \InvalidArgumentException $filename has to exist.
+	 * @throws \S3Exception              Failed to put object.
 	 */
-	public function upload( $bucket, $filename, $upload_path = null ) {
+	public function upload( $bucket, $filename, $upload_path = null, $put_public_acl = false ) {
 		if ( ! file_exists( $filename ) ) {
 			throw new \InvalidArgumentException( '$filename has to exist. $filename = ' . $filename );
 		}
@@ -176,11 +172,19 @@ class Static_Press_S3_Helper {
 				'ContentType' => $this->mime_type( $filename ),
 			)
 		);
+		/**
+		 * Backward compatibility:
+		 * - Setting permissions for website access - Amazon Simple Storage Service
+		 *   https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html#object-acl
+		 */
+		if ( $put_public_acl ) {
+			$args['ACL'] = 'public-read';
+		}
 		try {
 			return $this->s3->putObject( $args );
 		} catch ( S3Exception $e ) {
 			Static_Press_S3_Log::log( $e );
-			return false;
+			throw $e;
 		}
 	}
 

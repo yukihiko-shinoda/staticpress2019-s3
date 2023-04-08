@@ -67,7 +67,6 @@ if ( ! function_exists( 'static_press_s3_run' ) ) {
 		if ( ! isset( $staticpress ) ) {
 			return;
 		}
-		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
 		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-admin.php';
 		require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3.php';
 		new Static_Press_S3( Static_Press_S3_Admin::get_option() );

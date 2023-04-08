@@ -21,6 +21,7 @@ class Static_Press_S3_Finfo_Factory {
 	 *                           If the environment variable isn't set,
 	 *                           then PHP's bundled magic database will be used.
 	 *                           Passing NULL or an empty string will be equivalent to the default value.
+	 * @return FInfo finfo.
 	 */
 	public function create( $magic_file ) {
 		switch ( true ) {
@@ -41,6 +42,7 @@ class Static_Press_S3_Finfo_Factory {
 	 *                           If the environment variable isn't set,
 	 *                           then PHP's bundled magic database will be used.
 	 *                           Passing NULL or an empty string will be equivalent to the default value.
+	 * @return FInfo finfo.
 	 */
 	public function create_with_file( $magic_file ) {
 		return new FInfo( FILEINFO_MIME_TYPE, $magic_file );
@@ -48,6 +50,8 @@ class Static_Press_S3_Finfo_Factory {
 
 	/**
 	 * Creates finfo.
+	 * 
+	 * @return FInfo finfo.
 	 */
 	public function create_without_file() {
 		return new FInfo( FILEINFO_MIME_TYPE );

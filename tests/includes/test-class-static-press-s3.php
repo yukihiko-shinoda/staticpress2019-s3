@@ -49,7 +49,8 @@ class Static_Press_S3_Test extends Polyfill_WP_UnitTestCase {
 	 */
 	public function test_s3() {
 		$s3_bucket           = 'example.com';
-		$static_press_s3     = $this->create_static_press_s3( $s3_bucket );
+		$put_public_acl      = true;
+		$static_press_s3     = $this->create_static_press_s3( $s3_bucket, $put_public_acl );
 		$reflection          = new \ReflectionClass( get_class( $static_press_s3 ) );
 		$mock_s3_client      = Mock_Creator::create_s3_client_partial_mock();
 		$s3_batch_put_object = Mock_Creator::create_s3_batch_put_object_partial_mock( $mock_s3_client, $s3_bucket );
@@ -66,7 +67,8 @@ class Static_Press_S3_Test extends Polyfill_WP_UnitTestCase {
 	 */
 	public function test_s3_upload() {
 		$s3_bucket         = 'example.com';
-		$static_press_s3   = $this->create_static_press_s3( $s3_bucket );
+		$put_public_acl    = true;
+		$static_press_s3   = $this->create_static_press_s3( $s3_bucket, $put_public_acl );
 		$filename          = 'file.txt';
 		$response          = 'response';
 		$file_path         = Path_Creator::create_file_path( $filename );
@@ -91,12 +93,13 @@ class Static_Press_S3_Test extends Polyfill_WP_UnitTestCase {
 	 * @param string|null $bucket Bucket name.
 	 * @return Static_Press_S3
 	 */
-	private function create_static_press_s3( $bucket = null ) {
+	private function create_static_press_s3( $bucket = null, $put_public_acl = false ) {
 		$static_press_admin = new Static_Press_S3_Admin();
 		$option             = $static_press_admin->get_option();
 		if ( null !== $bucket ) {
 			$option['bucket'] = $bucket;
 		}
+		$option['put_object_acl'] = $put_public_acl;
 		return new Static_Press_S3( $option );
 	}
 }
