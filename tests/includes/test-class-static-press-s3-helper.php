@@ -211,8 +211,8 @@ class Static_Press_S3_Helper_Test extends Polyfill_WP_UnitTestCase {
 		$response          = 'response';
 		$expected_argument = array();
 		$s3_helper         = Mock_Creator::create_s3_helper_partial_mock( Mock_Creator::create_s3_client_partial_mock_put_object( $expected_argument, $response ) );
-		$this->expectException( InvalidArgumentException::class );
-		$s3_helper->upload( $bucket, Path_Creator::create_file_path( $filename ), $upload_path );
+		// $this->expectException( InvalidArgumentException::class );
+		$this->assertFalse( $s3_helper->upload( $bucket, Path_Creator::create_file_path( $filename ), $upload_path ) );
 	}
 
 	/**

@@ -155,7 +155,10 @@ class Static_Press_S3_Helper {
 	 */
 	public function upload( $bucket, $filename, $upload_path = null, $put_public_acl = false ) {
 		if ( ! file_exists( $filename ) ) {
-			throw new \InvalidArgumentException( '$filename has to exist. $filename = ' . $filename );
+			// To allow fail, StaticPress2019 still seems to fail dump in some case...
+			// throw new \InvalidArgumentException( '$filename has to exist. $filename = ' . $filename );
+			Static_Press_S3_Log::log( '$filename has to exist. $filename = ' . $filename );
+			return false;
 		}
 		if ( ! $upload_path ) {
 			$upload_path = $filename;
@@ -181,9 +184,7 @@ class Static_Press_S3_Helper {
 			return $this->s3->putObject( $args );
 		} catch ( S3Exception $e ) {
 			Static_Press_S3_Log::log( $e );
-			// To allow fail, StaticPress2019 still seems to fail dump in some case...
-			// throw $e;
-			return false;
+			throw $e;
 		}
 	}
 
