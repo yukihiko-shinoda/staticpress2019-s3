@@ -15,7 +15,7 @@ class Static_Press_S3_Finfo_Factory {
 	/**
 	 * Creates finfo.
 	 * 
-	 * @param string $magic_file Name of a magic database file,
+	 * @param string|null $magic_file Name of a magic database file,
 	 *                           usually something like /path/to/magic.mime.
 	 *                           If not specified, the MAGIC environment variable is used.
 	 *                           If the environment variable isn't set,
@@ -26,7 +26,9 @@ class Static_Press_S3_Finfo_Factory {
 	public function create( $magic_file ) {
 		switch ( true ) {
 			case false !== getenv( 'MAGIC' ) && file_exists( getenv( 'MAGIC' ) ):
+			case is_null( $magic_file ):
 			case ! file_exists( $magic_file ):
+			case is_dir( $magic_file ):
 				return $this->create_without_file();
 			default:
 				return $this->create_with_file( $magic_file );
