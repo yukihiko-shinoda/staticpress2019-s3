@@ -3,7 +3,7 @@ Contributors: yshinoda, wokamoto, mogmet
 Donate link: https://www.amazon.co.jp/hz/wishlist/ls/7XDWZD7KHD56?ref_=wl_share
 Tags: static aws s3
 Requires at least: 4.3
-Tested up to: 5.4
+Tested up to: 6.5
 Requires PHP: 5.6
 Stable tag: 0.1.1
 License: GPLv2 or later
