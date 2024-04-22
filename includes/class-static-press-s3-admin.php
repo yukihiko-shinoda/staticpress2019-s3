@@ -8,9 +8,11 @@
 namespace static_press_s3\includes;
 
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/exceptions/class-static-press-business-s3-logic-exception.php';
 
 use InputValidator;
 use static_press_s3\includes\Static_Press_S3_Helper;
+use static_press_s3\includes\exceptions\Static_Press_S3_Business_Logic_Exception;
 
 /**
  * StaticPress S3 Admin page.
@@ -59,9 +61,13 @@ class Static_Press_S3_Admin {
 	 * Gets option.
 	 * 
 	 * @return array Option.
+	 * @throws Static_Press_S3_Business_Logic_Exception Case when call this function before set option of OPTION_KEY.
 	 */
 	public static function get_option() {
 		$options = get_option( self::OPTION_KEY );
+		if ( false === $options ) {
+			throw new Static_Press_S3_Business_Logic_Exception();
+		}
 		foreach ( array_keys( self::option_keys() ) as $key ) {
 			if ( ! isset( $options[ $key ] ) || is_wp_error( $options[ $key ] ) ) {
 				$options[ $key ] = '';
