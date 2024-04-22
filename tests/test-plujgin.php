@@ -11,7 +11,9 @@
  * 
  * @see https://qiita.com/juthaDDA/items/fa2590c1032abbf87334
  */
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-option-setter.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-polyfill-wp-unittestcase.php';
+use static_press_s3\tests\testlibraries\Option_Setter;
 use static_press_s3\tests\testlibraries\Polyfill_WP_UnitTestCase;
 /**
  * Plugin test case.
@@ -41,6 +43,7 @@ class Plugin_Test extends Polyfill_WP_UnitTestCase {
 	 * File plugin.php should add filters.
 	 */
 	public function test() {
+		Option_Setter::set_up_option();
 		global $staticpress;
 		if ( ! isset( $staticpress ) ) {
 			$staticpress = 'temp';

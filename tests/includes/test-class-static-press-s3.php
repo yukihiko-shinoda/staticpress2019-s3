@@ -10,12 +10,14 @@ namespace static_press_s3\tests\includes;
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-admin.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-helper.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-option-setter.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-mock-creator.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-magic-for-test.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-polyfill-wp-unittestcase.php';
 use static_press_s3\includes\Static_Press_S3;
 use static_press_s3\includes\Static_Press_S3_Admin;
+use static_press_s3\tests\testlibraries\Option_Setter;
 use static_press_s3\tests\testlibraries\Path_Creator;
 use static_press_s3\tests\testlibraries\Mock_Creator;
 use static_press_s3\tests\testlibraries\Magic_For_Test;
@@ -33,6 +35,7 @@ class Static_Press_S3_Test extends Polyfill_WP_UnitTestCase {
 	 */
 	public function set_up() {
 		parent::set_up();
+		Option_Setter::set_up_option();
 		putenv( 'MAGIC=' . Magic_For_Test::get() );
 	}
 

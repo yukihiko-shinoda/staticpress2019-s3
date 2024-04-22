@@ -12,8 +12,10 @@
  * @see https://qiita.com/juthaDDA/items/fa2590c1032abbf87334
  */
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'includes/class-static-press-s3-admin.php';
+require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-option-setter.php';
 require_once STATIC_PRESS_S3_PLUGIN_DIR . 'tests/testlibraries/class-path-creator.php';
 use static_press_s3\includes\Static_Press_S3_Admin;
+use static_press_s3\tests\testlibraries\Option_Setter;
 use static_press_s3\tests\testlibraries\Path_Creator;
 /**
  * Static_Press_S3_Admin test case.
@@ -25,7 +27,8 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 	 * Test steps for init_s3().
 	 */
 	public function test_init_s3_empty_options() {
-		$this->expectOutputRegex( $this->create_regex( '', '', false ) );
+		Option_Setter::set_up_option();
+		$this->expectOutputRegex( $this->create_regex( 'accessKey', 'secretKey', false ) );
 		$admin = new Static_Press_S3_Admin();
 		$admin->options_page();
 	}
@@ -34,6 +37,7 @@ class Static_Press_S3_Admin_Test extends \WP_UnitTestCase {
 	 * Test steps for init_s3().
 	 */
 	public function test_option_keys() {
+		Option_Setter::set_up_option();
 		$admin = new Static_Press_S3_Admin();
 		$this->assertEquals(
 			$admin->option_keys(),
