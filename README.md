@@ -1,5 +1,6 @@
 # 🗽StaticPress2019-S3🗿
 
+[![Test](https://github.com/yukihiko-shinoda/staticpress2019-s3/workflows/Test/badge.svg)](https://github.com/yukihiko-shinoda/staticpress2019-s3/actions?query=workflow%3ATest)
 [![Build Status](https://app.travis-ci.com/yukihiko-shinoda/staticpress2019-s3.svg?branch=master)](https://app.travis-ci.com/yukihiko-shinoda/staticpress2019-s3)
 [![PHP from Travis config](https://img.shields.io/travis/php-v/yukihiko-shinoda/staticpress2019-s3/master)](https://app.travis-ci.com/yukihiko-shinoda/staticpress2019-s3)
 <!-- [![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/staticpress2019-s3)](https://wordpress.org/plugins/staticpress2019-s3/)
